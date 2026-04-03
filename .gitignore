@@ -2,6 +2,6 @@ Data/
 *.csv
 *.json
 *.xlsx
-dummy-env
-01_from_rule_to_genai/util_function
+dummy-env/
+01_from_rule_to_genai/util_function/
 __pycache__/
