@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML vs Deep Learning - Loan Approval System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.5s;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #34495e;
+            margin: 30px 0 20px 0;
+            font-size: 1.8em;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .data-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .image-placeholder {
+            width: 300px;
+            height: 190px;
+            background: linear-gradient(135deg, #e0e0e0, #f5f5f5);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            font-size: 3.5em;
+            border: 3px dashed #999;
+        }
+
+        .error-box {
+            background: #fee;
+            border: 3px solid #f44336;
+            border-radius: 10px;
+            padding: 30px;
+            color: #c62828;
+            font-size: 1.4em;
+            text-align: center;
+            margin: 30px 0;
+            font-weight: bold;
+        }
+
+        .success-box {
+            background: #e8f5e9;
+            border: 3px solid #4caf50;
+            border-radius: 10px;
+            padding: 30px;
+            color: #2e7d32;
+            font-size: 1.4em;
+            text-align: center;
+            margin: 30px 0;
+            font-weight: bold;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        /* Neural Network Visualization */
+        .neural-network-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 30px 0;
+        }
+
+        .neural-network {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .nn-layer {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            align-items: center;
+            position: relative;
+        }
+
+        .layer-label {
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+            min-height: 45px;
+        }
+
+        .neuron {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            border: 3px solid #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.4s ease;
+            position: relative;
+            font-size: 0.95em;
+            color: #555;
+        }
+
+        .neuron.active {
+            background: #4caf50;
+            border-color: #2e7d32;
+            color: white;
+            box-shadow: 0 0 25px rgba(76, 175, 80, 0.7);
+            transform: scale(1.1);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1.1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .neuron.active {
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        /* SVG connections */
+        .connections-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .connection-line {
+            stroke: #ddd;
+            stroke-width: 2;
+            transition: all 0.4s;
+        }
+
+        .connection-line.active {
+            stroke: #4caf50;
+            stroke-width: 3;
+            filter: drop-shadow(0 0 8px rgba(76, 175, 80, 0.8));
+        }
+
+        .training-viewer {
+            background: #1e1e1e;
+            color: #0f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            height: 350px;
+            overflow-y: auto;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+
+        .training-viewer::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .training-viewer::-webkit-scrollbar-track {
+            background: #333;
+        }
+
+        .training-viewer::-webkit-scrollbar-thumb {
+            background: #0f0;
+            border-radius: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 35px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px;
+            text-align: center;
+            margin: 30px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            background: #f5f5ff;
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+
+        .layer-output {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            .neural-network {
+                transform: scale(0.8);
+            }
+        }
+
+        /* GenAI specific styles */
+        .chat-interface {
+            background: #f5f5f5;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            min-height: 400px;
+        }
+
+        .chat-message {
+            margin: 15px 0;
+            padding: 18px;
+            border-radius: 12px;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: #667eea;
+            color: white;
+            margin-left: 15%;
+            text-align: right;
+        }
+
+        .ai-message {
+            background: white;
+            border: 2px solid #e0e0e0;
+            margin-right: 15%;
+        }
+
+        .typing-indicator {
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .typing-indicator span {
+            height: 10px;
+            width: 10px;
+            background: #667eea;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 3px;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .evolution-timeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .timeline-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .timeline-step:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2em;
+            color: #667eea;
+        }
+
+        .timeline-icon {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+        }
+
+        .timeline-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+
+        .timeline-desc {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .genai-highlight {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f) !important;
+            color: white;
+            border: none;
+        }
+
+        .wow-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 35px;
+            margin: 30px 0;
+            text-align: center;
+            font-size: 1.3em;
+            box-shadow: 0 10px 30px rgba(240, 147, 251, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .evolution-timeline {
+                flex-direction: column;
+                gap: 30px;
+            }
+            .timeline-step:not(:last-child)::after {
+                content: '↓';
+                right: auto;
+                top: auto;
+                bottom: -35px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- PAGE 1: Traditional ML Works -->
+        <div class="page active" id="page1">
+            <h1>🏦 Traditional Machine Learning</h1>
+            <h2>Loan Approval System</h2>
+            
+            <div class="card">
+                <h3>✅ Works Great with Structured Data!</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Customer ID</th>
+                            <th>Monthly Income</th>
+                            <th>CIBIL Score</th>
+                            <th>Loan Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>C001</td>
+                            <td>₹45,000</td>
+                            <td>720</td>
+                            <td style="color: green; font-weight: bold;">✅ Approved</td>
+                        </tr>
+                        <tr>
+                            <td>C002</td>
+                            <td>₹30,000</td>
+                            <td>650</td>
+                            <td style="color: green; font-weight: bold;">✅ Approved</td>
+                        </tr>
+                        <tr>
+                            <td>C003</td>
+                            <td>₹25,000</td>
+                            <td>490</td>
+                            <td style="color: red; font-weight: bold;">❌ Rejected</td>
+                        </tr>
+                        <tr>
+                            <td>C004</td>
+                            <td>₹60,000</td>
+                            <td>800</td>
+                            <td style="color: green; font-weight: bold;">✅ Approved</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="success-box">
+                Traditional ML Algorithm (KNN):<br>
+                "I learned patterns from Income + CIBIL Score!"<br>
+                <span style="font-size: 0.85em;">Prediction Accuracy: 87%</span>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn" onclick="nextPage(2)">Next: Enhance with Document Verification →</button>
+            </div>
+        </div>
+
+        <!-- PAGE 2: ML Cannot Handle Images -->
+        <div class="page" id="page2">
+            <h1>❌ Traditional ML Limitation</h1>
+            <h2>Bank Wants to Add: PAN Card Document Verification</h2>
+
+            <div class="card">
+                <h3>New Requirement: Verify PAN Card for Better Fraud Detection</h3>
+                <p style="margin: 15px 0; font-size: 1.15em;">
+                    <strong>Goal:</strong> Use Income + CIBIL + PAN Card Image to make better loan decisions
+                </p>
+                
+                <div class="image-placeholder">
+                    🆔<br>
+                    <small style="font-size: 0.28em;">PAN CARD IMAGE</small>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Income</th>
+                            <th>CIBIL</th>
+                            <th>PAN Card</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>C005</td>
+                            <td>₹50,000</td>
+                            <td>680</td>
+                            <td>📄 pan_image.jpg</td>
+                            <td>❓ Cannot Process</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="error-box">
+                ❌ TRADITIONAL ML FAILS!<br><br>
+                "I can work with numbers (Income, CIBIL)..."<br>
+                "But I CANNOT process IMAGES directly!"<br>
+                "How do I extract features from pixel data?"<br>
+                <br>
+                <span style="font-size: 0.9em;">Problem: Need automatic feature extraction from images</span>
+            </div>
+
+            <div class="card" style="background: #fff3e0; border-color: #ff9800;">
+                <h3>🤔 Why Traditional ML Cannot Handle This:</h3>
+                <ul style="line-height: 2.2em; font-size: 1.15em; margin: 15px 0 15px 30px;">
+                    <li>Cannot directly process raw image pixels</li>
+                    <li>Cannot detect if PAN card is genuine or fake</li>
+                    <li>Cannot verify document authenticity automatically</li>
+                    <li>Cannot recognize text or patterns in images</li>
+                    <li><strong>Requires YOU to manually engineer features (very difficult!)</strong></li>
+                </ul>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn" onclick="nextPage(1)">← Back</button>
+                <button class="btn" onclick="nextPage(3)">Solution: Deep Learning + Neural Networks →</button>
+            </div>
+        </div>
+
+        <!-- PAGE 3: Introduce Neural Networks -->
+        <div class="page" id="page3">
+            <h1>🧠 Deep Learning with Neural Networks</h1>
+            <h2>Automatic Feature Extraction from Complex Data!</h2>
+
+            <div class="comparison-grid">
+                <div class="card" style="border-color: #f44336; background: #ffebee;">
+                    <h3>❌ Traditional ML</h3>
+                    <div style="padding: 20px; text-align: center;">
+                        <div style="font-size: 3.5em; margin: 20px 0;">📊</div>
+                        <p style="font-size: 1.2em; margin: 15px 0;">
+                            <strong>YOU decide features</strong>
+                        </p>
+                        <p style="color: #666; margin: 10px 0; font-size: 1.05em;">
+                            Income + CIBIL → Algorithm
+                        </p>
+                        <p style="margin: 15px 0; font-size: 1.05em;">
+                            ✗ Cannot handle images<br>
+                            ✗ Manual feature engineering<br>
+                            ✗ Limited to structured data
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card" style="border-color: #4caf50; background: #e8f5e9;">
+                    <h3>✅ Deep Learning</h3>
+                    <div style="padding: 20px; text-align: center;">
+                        <div style="font-size: 3.5em; margin: 20px 0;">🧠</div>
+                        <p style="font-size: 1.2em; margin: 15px 0;">
+                            <strong>Neural Network learns features!</strong>
+                        </p>
+                        <p style="color: #666; margin: 10px 0; font-size: 1.05em;">
+                            Image → Neural Network → Decision
+                        </p>
+                        <p style="margin: 15px 0; font-size: 1.05em;">
+                            ✓ Handles images, audio, text<br>
+                            ✓ Automatic feature extraction<br>
+                            ✓ Learns complex patterns
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="neural-network-container">
+                <h3 style="text-align: center; margin-bottom: 25px; color: #2c3e50; font-size: 1.5em;">
+                    🧠 Neural Network Architecture
+                </h3>
+                
+                <div class="neural-network" id="staticNetwork">
+                    <svg class="connections-svg" id="connectionsSVG"></svg>
+                    
+                    <div class="nn-layer">
+                        <div class="layer-label">Input Layer<br>(Raw Data)</div>
+                        <div class="neuron" data-layer="0" data-neuron="0">x₁</div>
+                        <div class="neuron" data-layer="0" data-neuron="1">x₂</div>
+                        <div class="neuron" data-layer="0" data-neuron="2">x₃</div>
+                        <div class="neuron" data-layer="0" data-neuron="3">x₄</div>
+                    </div>
+                    
+                    <div class="nn-layer">
+                        <div class="layer-label">Hidden Layer 1<br>(Low-level Features)</div>
+                        <div class="neuron" data-layer="1" data-neuron="0">h₁</div>
+                        <div class="neuron" data-layer="1" data-neuron="1">h₂</div>
+                        <div class="neuron" data-layer="1" data-neuron="2">h₃</div>
+                    </div>
+                    
+                    <div class="nn-layer">
+                        <div class="layer-label">Hidden Layer 2<br>(High-level Patterns)</div>
+                        <div class="neuron" data-layer="2" data-neuron="0">h₄</div>
+                        <div class="neuron" data-layer="2" data-neuron="1">h₅</div>
+                        <div class="neuron" data-layer="2" data-neuron="2">h₆</div>
+                    </div>
+                    
+                    <div class="nn-layer">
+                        <div class="layer-label">Output Layer<br>(Decision)</div>
+                        <div class="neuron" data-layer="3" data-neuron="0">y</div>
+                    </div>
+                </div>
+
+                <p style="text-align: center; font-size: 1.25em; color: #1565c0; margin-top: 25px; line-height: 1.8em;">
+                    <strong>Each layer automatically learns features from the previous layer!<br>
+                    No manual feature engineering needed!</strong>
+                </p>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn" onclick="nextPage(2)">← Back</button>
+                <button class="btn" onclick="nextPage(4)">Watch Neural Network Training →</button>
+            </div>
+        </div>
+
+        <!-- PAGE 4: Training Neural Network -->
+        <div class="page" id="page4">
+            <h1>🎓 Training the Neural Network</h1>
+            <h2>Learning from 10,000 Loan Applications</h2>
+
+            <div class="card">
+                <h3>Training Dataset</h3>
+                <p style="font-size: 1.1em; margin: 15px 0; line-height: 1.8em;">
+                    • 10,000 loan applications<br>
+                    • Each with: Income + CIBIL + PAN Card Image<br>
+                    • Labels: Approved / Rejected<br>
+                    • 70% Training / 30% Validation
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>Training Progress</h3>
+                <div class="training-viewer" id="trainingLog">
+                    <div style="color: #0ff; margin-bottom: 15px; font-size: 1.05em;">
+                        ═══════════════════════════════════════════════════<br>
+                        Initializing Neural Network Training...<br>
+                        Model: Deep Convolutional Neural Network (CNN)<br>
+                        Layers: Input → Conv1 → Conv2 → Dense → Output<br>
+                        ═══════════════════════════════════════════════════
+                    </div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0%">0%</div>
+                </div>
+
+                <div id="trainingComplete" style="display: none; margin-top: 25px;">
+                    <div class="success-box">
+                        ✅ TRAINING COMPLETE!<br><br>
+                        Final Accuracy: <strong>96.5%</strong><br>
+                        Validation Accuracy: <strong>95.8%</strong><br>
+                        Loss: 0.038<br><br>
+                        <span style="font-size: 0.85em;">Neural Network learned to:<br>
+                        1. Extract features from PAN card images<br>
+                        2. Detect document authenticity<br>
+                        3. Combine with Income + CIBIL for decision</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn" onclick="nextPage(3)">← Back</button>
+                <button class="btn" id="startTrainingBtn" onclick="startTraining()">▶ Start Training</button>
+                <button class="btn" id="testModelBtn" onclick="nextPage(5)" style="display: none;">Test the Model →</button>
+            </div>
+        </div>
+
+        <!-- PAGE 5: Upload Test Data -->
+        <div class="page" id="page5">
+            <h1>🔍 Test the Trained Neural Network</h1>
+            <h2>New Loan Application</h2>
+
+            <div class="card">
+                <h3>Customer Information</h3>
+                <table class="data-table">
+                    <tr>
+                        <td style="width: 40%;"><strong>Monthly Income:</strong></td>
+                        <td>₹48,000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CIBIL Score:</strong></td>
+                        <td>685</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PAN Card:</strong></td>
+                        <td>To be uploaded</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="upload-area" onclick="simulateUpload()">
+                <div style="font-size: 4.5em; margin-bottom: 20px;">📤</div>
+                <h3>Click to Upload PAN Card Image</h3>
+                <p style="color: #666; margin-top: 15px; font-size: 1.1em;">
+                    (Demo mode - will simulate upload)
+                </p>
+            </div>
+
+            <div class="card" id="uploadedPreview" style="display: none;">
+                <h3>📄 Uploaded Document:</h3>
+                <div style="text-align: center;">
+                    <div class="image-placeholder" style="margin: 20px auto;">
+                        🆔<br>
+                        <small style="font-size: 0.3em;">PAN CARD<br>ABCDE1234F</small>
+                    </div>
+                    <p style="color: #666; font-size: 1.1em;">Filename: customer_pan_card.jpg</p>
+                    <p style="color: #666; font-size: 0.95em; margin-top: 10px;">Size: 245 KB | Resolution: 800×600</p>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn" onclick="nextPage(4)">← Back</button>
+                <button class="btn" id="analyzeBtn" style="display: none;" onclick="nextPage(6)">🧠 Process with Neural Network →</button>
+            </div>
+        </div>
+
+        <!-- PAGE 6: Neural Network Processing (Layer by Layer) -->
+        <div class="page" id="page6">
+            <h1>🧠 Neural Network Processing</h1>
+            <h2>Watch Each Layer Extract Features!</h2>
+
+            <div class="layer-output" id="inputLayer">
+                <h3>📥 Input Layer: Receiving Data</h3>
+                <div style="padding: 20px; background: #f5f5f5; border-radius: 10px; margin: 15px 0;">
+                    <table class="data-table" style="margin: 0;">
+                        <tr>
+                            <td style="width: 40%;"><strong>Monthly Income:</strong></td>
+                            <td>₹48,000 → Normalized: 0.48</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CIBIL Score:</strong></td>
+                            <td>685 → Normalized: 0.685</td>
+                        </tr>
+                        <tr>
+                            <td><strong>PAN Card Image:</strong></td>
+                            <td>800×600 pixels = 480,000 values</td>
+                        </tr>
+                    </table>
+                    <p style="text-align: center; margin-top: 15px; color: #666; font-size: 1.05em;">
+                        Total Input Neurons: 480,002
+                    </p>
+                </div>
+            </div>
+
+            <div class="layer-output" id="hidden1Layer" style="display: none;">
+                <h3>🔍 Hidden Layer 1: Low-Level Feature Detection</h3>
+                <div style="padding: 20px; background: #f5f5f5; border-radius: 10px; margin: 15px 0;">
+                    <div style="font-size: 3em; text-align: center; margin: 20px 0;">
+                        ▬ ▭ ╱ ╲ ▬ ◢ ◣
+                    </div>
+                    <p style="text-align: center; color: #555; font-size: 1.1em; line-height: 1.8em;">
+                        Detecting:<br>
+                        • Document edges and borders<br>
+                        • Text regions and blocks<br>
+                        • Logo and hologram areas<br>
+                        • Background patterns
+                    </p>
+                </div>
+            </div>
+
+            <div class="layer-output" id="hidden2Layer" style="display: none;">
+                <h3>📝 Hidden Layer 2: High-Level Pattern Recognition</h3>
+                <div style="padding: 20px; background: #f5f5f5; border-radius: 10px; margin: 15px 0;">
+                    <div style="font-size: 2.5em; text-align: center; margin: 20px 0;">
+                        🆔 PAN CARD<br>
+                        ABCDE1234F
+                    </div>
+                    <ul style="font-size: 1.1em; line-height: 2em; color: #555; max-width: 600px; margin: 20px auto;">
+                        <li>✓ Document format matches standard PAN card</li>
+                        <li>✓ Text is clearly readable</li>
+                        <li>✓ Logo and hologram detected</li>
+                        <li>✓ No visible tampering or editing</li>
+                        <li>✓ Print quality is authentic</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="layer-output" id="outputLayer" style="display: none; background: #e8f5e9; border-color: #4caf50;">
+                <h3>✅ Output Layer: Final Decision</h3>
+                <div style="padding: 30px; text-align: center;">
+                    <div style="font-size: 5em; margin: 20px 0;">✅</div>
+                    <h2 style="color: #2e7d32; margin: 25px 0; font-size: 2.2em;">
+                        LOAN APPROVED!
+                    </h2>
+                    <div style="margin: 35px auto; max-width: 550px;">
+                        <p style="font-size: 1.2em; margin-bottom: 15px;"><strong>Confidence Score:</strong></p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="confidenceBar" 
+                                 style="width: 0%; background: linear-gradient(90deg, #4caf50, #8bc34a);">
+                                0%
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background: white; border-radius: 10px; padding: 20px; margin-top: 25px;">
+                        <p style="font-size: 1.15em; color: #555; line-height: 1.8em;">
+                            <strong>Analysis:</strong><br>
+                            Income: ₹48,000 ✓<br>
+                            CIBIL Score: 685 ✓<br>
+                            PAN Card: Genuine & Verified ✓<br><br>
+                            <strong>All checks passed → Loan Approved</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-container" id="processingButtons" style="display: none;">
+                <button class="btn" onclick="nextPage(5)">← Try Another Application</button>
+                <button class="btn" onclick="nextPage(7)">See Final Summary →</button>
+            </div>
+        </div>
+
+        <!-- PAGE 7: Summary -->
+        <div class="page" id="page7">
+            <h1>🎓 Summary: Traditional ML vs Deep Learning</h1>
+
+            <div class="comparison-grid">
+                <div class="card" style="background: #ffebee; border-color: #f44336;">
+                    <h3>Traditional Machine Learning</h3>
+                    <div style="padding: 20px; font-size: 1.05em;">
+                        <p style="margin: 15px 0;"><strong>✅ Strengths:</strong></p>
+                        <ul style="line-height: 2em; margin-left: 20px;">
+                            <li>Works great with structured data (tables)</li>
+                            <li>Fast training on small datasets</li>
+                            <li>Easy to explain and interpret</li>
+                            <li>Lower computational requirements</li>
+                        </ul>
+                        
+                        <p style="margin: 20px 0 15px 0;"><strong>❌ Limitations:</strong></p>
+                        <ul style="line-height: 2em; margin-left: 20px;">
+                            <li>Cannot process images directly</li>
+                            <li>Requires manual feature engineering</li>
+                            <li>Limited to simple patterns</li>
+                            <li>Cannot handle unstructured data</li>
+                        </ul>
+                        
+                        <div style="text-align: center; font-size: 3.5em; margin: 25px 0;">📊</div>
+                        <p style="text-align: center; font-weight: bold; font-size: 1.05em;">
+                            Example: KNN, Decision Trees, Linear Regression
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card" style="background: #e8f5e9; border-color: #4caf50;">
+                    <h3>Deep Learning (Neural Networks)</h3>
+                    <div style="padding: 20px; font-size: 1.05em;">
+                        <p style="margin: 15px 0;"><strong>✅ Strengths:</strong></p>
+                        <ul style="line-height: 2em; margin-left: 20px;">
+                            <li>Handles images, audio, text, video</li>
+                            <li>Automatic feature extraction</li>
+                            <li>Learns very complex patterns</li>
+                            <li>State-of-the-art performance</li>
+                        </ul>
+                        
+                        <p style="margin: 20px 0 15px 0;"><strong>❌ Limitations:</strong></p>
+                        <ul style="line-height: 2em; margin-left: 20px;">
+                            <li>Needs large datasets (thousands+)</li>
+                            <li>Requires GPUs for training</li>
+                            <li>Harder to interpret ("black box")</li>
+                            <li>Longer training time</li>
+                        </ul>
+                        
+                        <div style="text-align: center; font-size: 3.5em; margin: 25px 0;">🧠</div>
+                        <p style="text-align: center; font-weight: bold; font-size: 1.05em;">
+                            Example: Neural Networks, CNN, RNN, Transformers
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h2 style="color: white; text-align: center; margin-bottom: 25px; font-size: 1.8em;">
+                    🎯 The Key Difference
+                </h2>
+                <div style="font-size: 1.3em; text-align: center; line-height: 2em; padding: 20px;">
+                    <p><strong>Deep Learning = Machine Learning++</strong></p>
+                    <p style="margin: 25px 0;">Same Goal: Learn patterns from data</p>
+                    <p>New Power: Handle complex unstructured data</p>
+                    <p style="margin: 25px 0;">
+                        Secret: <span style="background: rgba(255,255,255,0.3); padding: 8px 20px; border-radius: 8px;">Neural Networks with Multiple Layers</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 20px;">🏦 When to Use What?</h3>
+                <div class="comparison-grid" style="margin-top: 25px;">
+                    <div style="background: #f5f5f5; padding: 25px; border-radius: 10px;">
+                        <h4 style="color: #f44336; margin-bottom: 15px; font-size: 1.2em;">Use Traditional ML when:</h4>
+                        <ul style="line-height: 2.2em; font-size: 1.05em;">
+                            <li>Data is structured (tables/spreadsheets)</li>
+                            <li>Dataset is small (&lt;1000 samples)</li>
+                            <li>You need to explain decisions</li>
+                            <li>Fast training is important</li>
+                            <li><strong>Example: Credit scoring, fraud detection from numbers</strong></li>
+                        </ul>
+                    </div>
+                    <div style="background: #f5f5f5; padding: 25px; border-radius: 10px;">
+                        <h4 style="color: #4caf50; margin-bottom: 15px; font-size: 1.2em;">Use Deep Learning when:</h4>
+                        <ul style="line-height: 2.2em; font-size: 1.05em;">
+                            <li>Data is unstructured (images/audio/text)</li>
+                            <li>Large dataset available (10,000+ samples)</li>
+                            <li>High accuracy is critical</li>
+                            <li>Have computational resources (GPU)</li>
+                            <li><strong>Example: Document verification, image recognition, chatbots</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="success-box" style="font-size: 1.25em;">
+                <strong>Real-World Banking Applications:</strong><br><br>
+                Traditional ML: Loan approval from Income + CIBIL<br>
+                Deep Learning: Loan approval from Income + CIBIL + Document Images<br><br>
+                <span style="font-size: 0.85em;">Best approach: Combine both for maximum accuracy!</span>
+            </div>
+
+            <div class="success-box" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-color: #f093fb;">
+                <strong style="font-size: 1.3em;">🚀 But Wait... There's MORE!</strong><br><br>
+                <span style="font-size: 0.95em;">What if Neural Networks could not just CLASSIFY... but also CREATE?</span>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn" onclick="nextPage(1)" style="font-size: 1.1em; padding: 15px 40px;">
+                    🔄 Start Over
+                </button>
+                <button class="btn" onclick="nextPage(8)" style="font-size: 1.3em; padding: 20px 55px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none;">
+                    ✨ Discover Generative AI →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Page navigation
+        function nextPage(pageNum) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById('page' + pageNum).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // Draw neural network connections
+        function drawConnections() {
+            const svg = document.getElementById('connectionsSVG');
+            const network = document.getElementById('staticNetwork');
+            
+            if (!svg || !network) return;
+            
+            const rect = network.getBoundingClientRect();
+            svg.setAttribute('width', rect.width);
+            svg.setAttribute('height', rect.height);
+            
+            const layers = document.querySelectorAll('.nn-layer');
+            
+            for (let i = 0; i < layers.length - 1; i++) {
+                const currentLayer = layers[i].querySelectorAll('.neuron');
+                const nextLayer = layers[i + 1].querySelectorAll('.neuron');
+                
+                currentLayer.forEach(neuron1 => {
+                    const rect1 = neuron1.getBoundingClientRect();
+                    const networkRect = network.getBoundingClientRect();
+                    const x1 = rect1.left - networkRect.left + rect1.width / 2;
+                    const y1 = rect1.top - networkRect.top + rect1.height / 2;
+                    
+                    nextLayer.forEach(neuron2 => {
+                        const rect2 = neuron2.getBoundingClientRect();
+                        const x2 = rect2.left - networkRect.left + rect2.width / 2;
+                        const y2 = rect2.top - networkRect.top + rect2.height / 2;
+                        
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('x1', x1);
+                        line.setAttribute('y1', y1);
+                        line.setAttribute('x2', x2);
+                        line.setAttribute('y2', y2);
+                        line.classList.add('connection-line');
+                        svg.appendChild(line);
+                    });
+                });
+            }
+        }
+
+        // Initialize on page 3
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.target.id === 'page3' && mutation.target.classList.contains('active')) {
+                    setTimeout(drawConnections, 100);
+                }
+            });
+        });
+
+        document.querySelectorAll('.page').forEach(page => {
+            observer.observe(page, { attributes: true, attributeFilter: ['class'] });
+        });
+
+        // Training simulation
+        function startTraining() {
+            const btn = document.getElementById('startTrainingBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Training in Progress...';
+            
+            const log = document.getElementById('trainingLog');
+            const progressBar = document.getElementById('progressBar');
+            
+            let epoch = 0;
+            const maxEpochs = 100;
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    log.innerHTML += `\n<div style="color: #0f0; font-weight: bold; margin-top: 20px; font-size: 1.05em;">
+                        ═══════════════════════════════════════════════════<br>
+                        ✅ TRAINING COMPLETE!<br>
+                        Epochs: ${maxEpochs}/100 | Accuracy: 96.5% | Val Acc: 95.8%<br>
+                        ═══════════════════════════════════════════════════
+                    </div>`;
+                    
+                    document.getElementById('trainingComplete').style.display = 'block';
+                    document.getElementById('testModelBtn').style.display = 'inline-block';
+                    btn.style.display = 'none';
+                    log.scrollTop = log.scrollHeight;
+                    return;
+                }
+                
+                epoch++;
+                const accuracy = (50 + (progress / 2)).toFixed(1);
+                const valAcc = (48 + (progress / 2.2)).toFixed(1);
+                const loss = (1.5 - (progress / 70)).toFixed(3);
+                
+                log.innerHTML += `\n<div style="color: #fff;">
+                    Epoch ${epoch}/${maxEpochs} | Train Acc: ${accuracy}% | Val Acc: ${valAcc}% | Loss: ${loss}
+                </div>`;
+                
+                log.scrollTop = log.scrollHeight;
+                
+                progress += 1;
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = progress + '%';
+                
+            }, 300);
+        }
+
+        // Upload simulation
+        function simulateUpload() {
+            document.getElementById('uploadedPreview').style.display = 'block';
+            document.getElementById('analyzeBtn').style.display = 'inline-block';
+        }
+
+        // Layer-by-layer processing animation
+        const page6Observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.target.id === 'page6' && mutation.target.classList.contains('active')) {
+                    animateProcessing();
+                }
+            });
+        });
+
+        document.querySelectorAll('.page').forEach(page => {
+            page6Observer.observe(page, { attributes: true, attributeFilter: ['class'] });
+        });
+
+        function animateProcessing() {
+            const layers = [
+                { id: 'inputLayer', delay: 500 },
+                { id: 'hidden1Layer', delay: 2500 },
+                { id: 'hidden2Layer', delay: 5000 },
+                { id: 'outputLayer', delay: 7500 }
+            ];
+            
+            layers.forEach(layer => {
+                setTimeout(() => {
+                    document.getElementById(layer.id).style.display = 'block';
+                    
+                    if (layer.id === 'outputLayer') {
+                        setTimeout(() => {
+                            document.getElementById('confidenceBar').style.width = '92.7%';
+                            document.getElementById('confidenceBar').textContent = '92.7% Confidence';
+                        }, 600);
+                        
+                        setTimeout(() => {
+                            document.getElementById('processingButtons').style.display = 'block';
+                        }, 2500);
+                    }
+                }, layer.delay);
+            });
+        }
+    </script>
+</body>
+</html>
+
+        <!-- PAGE 8: Evolution - ML to DL to GenAI -->
+        <div class="page" id="page8">
+            <h1>🚀 The Next Evolution: Generative AI</h1>
+            <h2>From Understanding to Creating</h2>
+
+            <div class="evolution-timeline">
+                <div class="timeline-step">
+                    <div class="timeline-icon">📊</div>
+                    <div class="timeline-title">Traditional ML</div>
+                    <div class="timeline-desc">Predict/Classify<br>"Approved or Rejected?"</div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-icon">🧠</div>
+                    <div class="timeline-title">Deep Learning</div>
+                    <div class="timeline-desc">Handle Complex Data<br>"Verify this image"</div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-icon">✨</div>
+                    <div class="timeline-title">Generative AI</div>
+                    <div class="timeline-desc">Create New Content<br>"Write, design, generate"</div>
+                </div>
+            </div>
+
+            <div class="card" style="background: #e3f2fd; border-color: #2196f3;">
+                <h3>🤔 What Changed?</h3>
+                <div class="comparison-grid">
+                    <div>
+                        <h4 style="color: #667eea; margin-bottom: 15px;">Classification Models:</h4>
+                        <p style="font-size: 1.1em; line-height: 2em;">
+                            <strong>Input:</strong> Data<br>
+                            <strong>Output:</strong> Category/Number<br>
+                            <strong>Example:</strong> Approved or Rejected
+                        </p>
+                        <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 15px;">
+                            <p style="color: #666;">Income: ₹50,000<br>CIBIL: 720<br>↓<br><strong style="color: green;">✅ APPROVED</strong></p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="color: #f5576c; margin-bottom: 15px;">Generative Models:</h4>
+                        <p style="font-size: 1.1em; line-height: 2em;">
+                            <strong>Input:</strong> Instruction/Prompt<br>
+                            <strong>Output:</strong> NEW Content<br>
+                            <strong>Example:</strong> Complete text, emails, reports
+                        </p>
+                        <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 15px;">
+                            <p style="color: #666;">"Write approval email"<br>↓<br><strong style="color: #f5576c;">📧 Full email generated!</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn" onclick="nextPage(7)">← Back to Summary</button>
+                <button class="btn genai-highlight" onclick="nextPage(9)">See How It Works →</button>
+            </div>
+        </div>
+
+        <!-- PAGE 9: Same Neural Networks, Different Task -->
+        <div class="page" id="page9">
+            <h1>🧠 Same Neural Networks, New Superpower!</h1>
+            <h2>Language Models: Understanding & Generating Text</h2>
+
+            <div class="wow-box">
+                <h2 style="color: white; margin-bottom: 20px;">💡 The Big Reveal</h2>
+                <p style="font-size: 1.25em; line-height: 1.8em;">
+                    GenAI is NOT something completely new!<br>
+                    It's the SAME Neural Networks...<br>
+                    But trained to <strong>GENERATE</strong> instead of just <strong>CLASSIFY</strong>!
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>What are Language Models (LLMs)?</h3>
+                <p style="font-size: 1.15em; line-height: 1.9em; margin: 20px 0;">
+                    <strong>Language Model</strong> = Neural Network trained on massive text data<br>
+                    <strong>Task:</strong> Predict the next word in a sequence<br>
+                    <strong>Training Data:</strong> Billions of web pages, books, articles<br>
+                    <strong>Result:</strong> Understands language patterns, grammar, context, knowledge
+                </p>
+            </div>
+
+            <div class="neural-network-container">
+                <h3 style="text-align: center; margin-bottom: 25px;">
+                    🔄 Same Architecture, Different Output
+                </h3>
+                
+                <div class="comparison-grid">
+                    <div style="background: white; padding: 25px; border-radius: 10px;">
+                        <h4 style="color: #667eea; text-align: center;">Classification Model</h4>
+                        <div style="margin: 30px 0; text-align: center;">
+                            <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; margin: 10px 0;">Input: Data</div>
+                            <div style="font-size: 2em; margin: 15px 0;">↓</div>
+                            <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; margin: 10px 0;">Neural Network</div>
+                            <div style="font-size: 2em; margin: 15px 0;">↓</div>
+                            <div style="padding: 15px; background: #e8f5e9; border-radius: 8px; font-weight: bold;">
+                                Output: Category<br>(Approved/Rejected)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; padding: 25px; border-radius: 10px;">
+                        <h4 style="color: #f5576c; text-align: center;">Generative Model (LLM)</h4>
+                        <div style="margin: 30px 0; text-align: center;">
+                            <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; margin: 10px 0;">Input: Text Prompt</div>
+                            <div style="font-size: 2em; margin: 15px 0;">↓</div>
+                            <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; margin: 10px 0;">Neural Network<br>(SAME!)</div>
+                            <div style="font-size: 2em; margin: 15px 0;">↓</div>
+                            <div style="padding: 15px; background: #ffe8e8; border-radius: 8px; font-weight: bold;">
+                                Output: New Text<br>(Complete sentences!)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn" onclick="nextPage(8)">← Back</button>
+                <button class="btn genai-highlight" onclick="nextPage(10)">See LLM in Action →</button>
+            </div>
+        </div>
+
+        <!-- PAGE 10: Interactive LLM Demo -->
+        <div class="page" id="page10">
+            <h1>✨ Large Language Model in Action</h1>
+            <h2>Banking Use Case: Auto-Generate Loan Emails</h2>
+
+            <div class="card">
+                <h3>Scenario: Loan Decision Made</h3>
+                <table class="data-table">
+                    <tr><td style="width: 40%;"><strong>Customer Name:</strong></td><td>Rahul Tiwari</td></tr>
+                    <tr><td><strong>Loan Amount:</strong></td><td>₹5,00,000</td></tr>
+                    <tr><td><strong>Decision:</strong></td><td style="color: green; font-weight: bold;">✅ APPROVED</td></tr>
+                    <tr><td><strong>Task:</strong></td><td>Generate approval email</td></tr>
+                </table>
+            </div>
+
+            <div class="card" style="background: #e3f2fd; border-color: #2196f3;">
+                <h3>💬 Prompt to LLM:</h3>
+                <div style="background: white; padding: 20px; border-radius: 10px; margin: 15px 0; font-family: 'Courier New', monospace; border: 2px solid #2196f3;">
+                    <p style="font-size: 1.05em;">"Write a professional loan approval email to Rahul Tiwari for ₹5,00,000. Include next steps and required documents."</p>
+                </div>
+            </div>
+
+            <div class="chat-interface" id="llmOutput">
+                <div style="text-align: center; color: #999; font-size: 1.1em; padding: 50px;">
+                    <div class="typing-indicator"><span></span><span></span><span></span></div>
+                    <p style="margin-top: 15px;">LLM is generating response...</p>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn" onclick="nextPage(9)">← Back</button>
+                <button class="btn genai-highlight" id="generateBtn" onclick="generateLLMResponse()">✨ Generate Email with LLM</button>
+                <button class="btn" id="nextAfterLLM" onclick="nextPage(11)" style="display: none;">Continue to Final Summary →</button>
+            </div>
+        </div>
+
+        <!-- PAGE 11: Complete Journey Summary -->
+        <div class="page" id="page11">
+            <h1>🎓 The Complete AI Journey</h1>
+            <h2>From Simple Classification to Creative Generation</h2>
+
+            <div class="evolution-timeline">
+                <div class="timeline-step">
+                    <div class="timeline-icon">📊</div>
+                    <div class="timeline-title">Machine Learning</div>
+                    <div class="timeline-desc"><strong>What:</strong> Learn patterns<br><strong>Task:</strong> Predict/Classify<br><strong>Example:</strong> Loan approval</div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-icon">🧠</div>
+                    <div class="timeline-title">Deep Learning</div>
+                    <div class="timeline-desc"><strong>What:</strong> Neural Networks<br><strong>Task:</strong> Handle complex data<br><strong>Example:</strong> Image verification</div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-icon">✨</div>
+                    <div class="timeline-title">Generative AI</div>
+                    <div class="timeline-desc"><strong>What:</strong> Same networks!<br><strong>Task:</strong> Generate content<br><strong>Example:</strong> Write emails, code</div>
+                </div>
+            </div>
+
+            <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                <h2 style="color: white; text-align: center; margin-bottom: 25px;">🎯 The Key Insight</h2>
+                <div style="font-size: 1.3em; text-align: center; line-height: 2.2em; padding: 20px;">
+                    <p><strong>GenAI is NOT a revolution</strong></p>
+                    <p style="margin: 25px 0;">It's an EVOLUTION of the same Neural Networks!</p>
+                    <p><strong>Same foundation, enhanced capabilities</strong></p>
+                </div>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="card" style="border-color: #667eea;">
+                    <h3>What Stayed the Same</h3>
+                    <ul style="line-height: 2.3em; font-size: 1.1em; margin: 20px 0 20px 25px;">
+                        <li>Neural Network architecture</li>
+                        <li>Training process (forward + backward)</li>
+                        <li>Optimization (gradient descent)</li>
+                        <li>Learn from massive data</li>
+                        <li>Automatic feature extraction</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-color: #f5576c;">
+                    <h3>What Changed</h3>
+                    <ul style="line-height: 2.3em; font-size: 1.1em; margin: 20px 0 20px 25px;">
+                        <li><strong>Task:</strong> Generate, not just classify</li>
+                        <li><strong>Output:</strong> Creative content</li>
+                        <li><strong>Training:</strong> Text prediction</li>
+                        <li><strong>Scale:</strong> Billions of parameters</li>
+                        <li><strong>Data:</strong> Internet-scale text</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🏦 Banking Applications: The Full Spectrum</h3>
+                <div style="margin-top: 25px;">
+                    <div style="background: #f5f5f5; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #667eea; margin-bottom: 12px;">1. Traditional ML:</h4>
+                        <p style="font-size: 1.05em; line-height: 1.8em;">• Credit scoring (Income + CIBIL → Score)<br>• Fraud detection from transaction amounts<br>• Customer churn prediction</p>
+                    </div>
+                    <div style="background: #f5f5f5; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #2196f3; margin-bottom: 12px;">2. Deep Learning:</h4>
+                        <p style="font-size: 1.05em; line-height: 1.8em;">• Document verification (PAN, Aadhaar)<br>• Signature verification<br>• Cheque reading (OCR)<br>• Face recognition for authentication</p>
+                    </div>
+                    <div style="background: #f5f5f5; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #f5576c; margin-bottom: 12px;">3. Generative AI (LLMs):</h4>
+                        <p style="font-size: 1.05em; line-height: 1.8em;">• Auto-generate approval/rejection emails<br>• Customer support chatbots<br>• Loan application summaries<br>• Personalized financial advice<br>• Generate report narratives</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wow-box">
+                <h2 style="color: white; margin-bottom: 20px;">🚀 You Now Understand</h2>
+                <p style="font-size: 1.3em; line-height: 2em;">
+                    ✓ Traditional ML: Predictions from structured data<br>
+                    ✓ Deep Learning: Handle images, audio, text<br>
+                    ✓ Generative AI: Create new content<br><br>
+                    <strong style="font-size: 1.2em;">All built on the SAME foundation: Neural Networks!</strong>
+                </p>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn" style="font-size: 1.3em; padding: 20px 55px;" onclick="location.reload()">🔄 Start Complete Journey Again</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Page navigation
+        function nextPage(pageNum) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById('page' + pageNum).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Generate LLM Response
+        function generateLLMResponse() {
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Generating...';
+            
+            setTimeout(() => {
+                document.getElementById('llmOutput').innerHTML = `
+<div class="ai-message">
+    <p style="margin-bottom: 15px;"><strong>📧 Generated Email:</strong></p>
+    <div style="border-left: 4px solid #667eea; padding-left: 20px; margin: 15px 0;">
+        <p style="margin: 10px 0;"><strong>To:</strong> rahul.tiwari@email.com</p>
+        <p style="margin: 10px 0;"><strong>Subject:</strong> Loan Application Approved - ₹5,00,000</p>
+        <hr style="margin: 15px 0; border: none; border-top: 1px solid #e0e0e0;">
+        <p style="margin: 15px 0;">Dear Rahul Tiwari,</p>
+        <p style="margin: 15px 0; line-height: 1.8em;">We are pleased to inform you that your loan application for ₹5,00,000 has been <strong>approved</strong>! Congratulations on this important financial step.</p>
+        <p style="margin: 15px 0; line-height: 1.8em;"><strong>Next Steps:</strong></p>
+        <ol style="margin: 10px 0 10px 25px; line-height: 2em;">
+            <li>Submit documents: PAN Card, Aadhaar, salary slips (last 3 months), bank statements (last 6 months)</li>
+            <li>Visit nearest branch to sign loan agreement</li>
+            <li>Loan disbursement within 48 hours of verification</li>
+        </ol>
+        <p style="margin: 15px 0;"><strong>Loan Details:</strong><br>Amount: ₹5,00,000 | Interest: 10.5% p.a. | Tenure: 5 years | EMI: ₹10,728/month</p>
+        <p style="margin: 15px 0;">Best regards,<br><strong>Loan Processing Team</strong><br>XYZ Bank</p>
+    </div>
+</div>
+<div style="background: #fff9c4; border-left: 5px solid #fbc02d; padding: 20px; border-radius: 8px; margin: 25px 0;">
+    <p style="font-size: 1.1em; margin-bottom: 12px;"><strong>✨ What Just Happened?</strong></p>
+    <p style="line-height: 1.8em;">The LLM neural network:<br>
+    1. <strong>Understood</strong> the prompt context<br>
+    2. <strong>Retrieved</strong> learned patterns about email structure<br>
+    3. <strong>Generated</strong> professional, contextually appropriate text<br>
+    4. <strong>Formatted</strong> it as a complete business email<br><br>
+    <strong style="color: #f57f17;">Same neural networks that classified images... now generating text!</strong></p>
+</div>`;
+                
+                btn.style.display = 'none';
+                document.getElementById('nextAfterLLM').style.display = 'inline-block';
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
