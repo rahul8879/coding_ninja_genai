@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session 4 — Advanced Prompt Engineering</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0d0f14;
+  --paper: #f7f6f2;
+  --warm: #eeeae0;
+  --surface: #e8e4d8;
+  --accent: #1a6b4a;
+  --accent2: #c94040;
+  --accent3: #c27c2a;
+  --accent4: #2563af;
+  --muted: #5a5850;
+  --border: #d4cfc0;
+  --code-bg: #11141f;
+  --code-text: #dde4f0;
+  --code-green: #7de0a0;
+  --code-yellow: #f0d080;
+  --code-red: #f07070;
+  --code-blue: #80c0f0;
+  --code-purple: #c0a0f0;
+  --code-comment: #4a5568;
+  --pain: #fff5f5;
+  --pain-border: #f5c6c6;
+  --win: #f0fff8;
+  --win-border: #b2dfcc;
+  --think: #f5f0ff;
+  --think-border: #c8b4f0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Lora', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.progress-strip { position: fixed; top:0; left:0; right:0; height:3px; background:var(--border); z-index:999; }
+.progress-fill { height:100%; background: linear-gradient(90deg, var(--accent), var(--accent4)); width:0%; transition:width .3s; }
+
+.topnav {
+  position:fixed; top:3px; left:0; right:0; height:52px;
+  background:rgba(247,246,242,0.96); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; padding:0 32px; gap:0;
+  z-index:998; backdrop-filter:blur(8px); overflow-x:auto;
+}
+
+.nav-session-label {
+  font-family:'JetBrains Mono',monospace; font-size:10px;
+  color:var(--accent); letter-spacing:2px; text-transform:uppercase;
+  margin-right:24px; white-space:nowrap; flex-shrink:0;
+}
+
+.nav-chapters { display:flex; gap:4px; align-items:center; }
+.nav-ch {
+  font-family:'JetBrains Mono',monospace; font-size:11px;
+  color:var(--muted); padding:4px 10px; border-radius:4px;
+  cursor:pointer; background:none; border:none; white-space:nowrap; transition:all .2s;
+}
+.nav-ch:hover { background:var(--warm); color:var(--ink); }
+.nav-ch.active { background:var(--ink); color:white; }
+.nav-right { margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); white-space:nowrap; flex-shrink:0; }
+
+.main { padding-top:55px; }
+
+.chapter { display:none; max-width:800px; margin:0 auto; padding:60px 32px 100px; }
+.chapter.active { display:block; }
+
+.ch-hero { margin-bottom:56px; padding-bottom:40px; border-bottom:2px solid var(--ink); }
+.ch-number { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:3px; text-transform:uppercase; margin-bottom:16px; }
+.ch-title { font-family:'Bricolage Grotesque',sans-serif; font-size:44px; font-weight:800; line-height:1.05; margin-bottom:20px; }
+.ch-title .accent { color:var(--accent); }
+.ch-title .accent2 { color:var(--accent2); }
+.ch-title .accent4 { color:var(--accent4); }
+.ch-subtitle { font-size:17px; color:var(--muted); max-width:580px; line-height:1.7; font-style:italic; }
+
+.ch-objectives { margin-top:28px; padding:20px 24px; background:var(--warm); border-radius:8px; border-left:3px solid var(--accent3); }
+.ch-objectives .obj-title { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+.ch-objectives ul { padding-left:18px; font-size:14px; color:var(--ink); line-height:1.8; font-family:'Bricolage Grotesque',sans-serif; }
+
+/* RECALL BOX — connects to previous session */
+.recall-box {
+  background: #fffbe6;
+  border:2px solid #f5d67a;
+  border-radius:12px;
+  padding:24px 28px;
+  margin:0 0 40px;
+  position:relative;
+}
+.recall-box::before { content:'⬅ Session 3 Recap'; position:absolute; top:-14px; left:16px; background:var(--paper); padding:0 8px; font-family:'JetBrains Mono',monospace; font-size:10px; color:#92660a; letter-spacing:2px; text-transform:uppercase; font-weight:700; }
+.recall-box p { margin:0; font-size:14.5px; color:var(--ink); }
+
+h2 { font-family:'Bricolage Grotesque',sans-serif; font-size:28px; font-weight:800; margin:48px 0 20px; line-height:1.2; }
+h3 { font-family:'Bricolage Grotesque',sans-serif; font-size:20px; font-weight:700; margin:36px 0 14px; }
+h4 { font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; margin:24px 0 8px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+p { margin-bottom:18px; color:var(--ink); }
+
+.story-box { background:#fffbef; border:1px solid #e8c96a; border-radius:10px; padding:24px 28px; margin:28px 0; position:relative; }
+.story-box::before { content:'📖'; position:absolute; top:-14px; left:20px; background:var(--paper); padding:0 6px; font-size:18px; }
+.story-box .story-label { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--accent3); letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; font-weight:600; }
+
+.pain-box { background:var(--pain); border:1px solid var(--pain-border); border-radius:10px; padding:24px 28px; margin:28px 0; position:relative; }
+.pain-box::before { content:'🔥'; position:absolute; top:-14px; left:20px; background:var(--paper); padding:0 6px; font-size:18px; }
+.pain-box .pain-label { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--accent2); letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; font-weight:600; }
+
+.win-box { background:var(--win); border:1px solid var(--win-border); border-radius:10px; padding:24px 28px; margin:28px 0; position:relative; }
+.win-box::before { content:'✅'; position:absolute; top:-14px; left:20px; background:var(--paper); padding:0 6px; font-size:18px; }
+.win-box .win-label { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--accent); letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; font-weight:600; }
+
+.think-box { background:var(--think); border:1px solid var(--think-border); border-radius:10px; padding:24px 28px; margin:28px 0; position:relative; }
+.think-box::before { content:'🧠'; position:absolute; top:-14px; left:20px; background:var(--paper); padding:0 6px; font-size:18px; }
+.think-box .think-label { font-family:'JetBrains Mono',monospace; font-size:10px; color:#6b21a8; letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; font-weight:600; }
+
+.tip-box { background:#f0f7ff; border:1px solid #b3d4f5; border-radius:10px; padding:20px 24px; margin:24px 0; }
+.tip-box .tip-label { font-family:'JetBrains Mono',monospace; font-size:10px; color:#1e40af; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; font-weight:600; }
+
+.code-block { background:var(--code-bg); border-radius:10px; margin:24px 0; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.14); }
+.code-header { display:flex; align-items:center; padding:12px 18px; border-bottom:1px solid rgba(255,255,255,0.07); gap:10px; }
+.code-dots { display:flex; gap:6px; }
+.code-dot { width:10px; height:10px; border-radius:50%; }
+.dot-r { background:#ff5f57; } .dot-y { background:#febc2e; } .dot-g { background:#28c840; }
+.code-filename { font-family:'JetBrains Mono',monospace; font-size:12px; color:rgba(255,255,255,0.4); margin-left:4px; }
+.code-tag { margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:10px; padding:2px 8px; border-radius:4px; }
+.code-tag.pain-tag { background:rgba(192,64,64,0.2); color:#f07070; }
+.code-tag.win-tag { background:rgba(42,157,143,0.2); color:var(--code-green); }
+.code-tag.think-tag { background:rgba(124,92,252,0.2); color:#c0a0f0; }
+.code-body { padding:20px 22px; overflow-x:auto; }
+.code-body pre { font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.75; color:var(--code-text); white-space:pre; }
+.ck { color:var(--code-comment); font-style:italic; }
+.cg { color:var(--code-green); }
+.cy { color:var(--code-yellow); }
+.cr { color:var(--code-red); }
+.cb { color:var(--code-blue); }
+.cm { color:var(--code-purple); }
+.co { color:#f0a060; }
+
+.output-block { background:#090c14; border-radius:8px; padding:16px 20px; margin:8px 0 20px; border-left:3px solid rgba(255,255,255,0.08); }
+.output-block .out-label { font-family:'JetBrains Mono',monospace; font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; }
+.output-block pre { font-family:'JetBrains Mono',monospace; font-size:13px; color:rgba(255,255,255,0.65); white-space:pre-wrap; line-height:1.65; }
+.output-block.bad pre { color:#f08080; }
+.output-block.good pre { color:#80d8a0; }
+.output-block.think pre { color:#c0a0f0; }
+
+.compare { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:24px 0; }
+.compare-card { border-radius:8px; padding:16px 18px; border:1px solid var(--border); }
+.compare-card.bad { background:var(--pain); border-color:var(--pain-border); }
+.compare-card.good { background:var(--win); border-color:var(--win-border); }
+.c-label { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; font-weight:700; }
+.compare-card.bad .c-label { color:var(--accent2); }
+.compare-card.good .c-label { color:var(--accent); }
+.compare-card p { margin:0; font-size:14px; line-height:1.6; }
+
+code { font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--warm); border:1px solid var(--border); border-radius:4px; padding:1px 6px; color:var(--accent2); }
+
+.divider { text-align:center; margin:40px 0; color:var(--muted); font-size:22px; letter-spacing:6px; }
+
+.evolution { margin:32px 0; }
+.evo-step { display:flex; gap:20px; margin-bottom:32px; align-items:flex-start; }
+.evo-num { width:36px; height:36px; border-radius:50%; background:var(--ink); color:white; font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+.evo-num.pain { background:var(--accent2); }
+.evo-num.win { background:var(--accent); }
+.evo-num.think { background:#6b21a8; }
+.evo-content { flex:1; }
+.evo-content h4 { margin:0 0 8px; font-size:15px; color:var(--ink); text-transform:none; letter-spacing:0; }
+
+.handson { background:#f8f0ff; border:2px solid #d4b8f0; border-radius:12px; padding:28px 32px; margin:36px 0; }
+.handson .hs-title { font-family:'Bricolage Grotesque',sans-serif; font-size:18px; font-weight:800; color:#6b21a8; margin-bottom:6px; display:flex; align-items:center; gap:10px; }
+.handson .hs-subtitle { font-family:'JetBrains Mono',monospace; font-size:11px; color:#9333ea; letter-spacing:1px; margin-bottom:18px; }
+.hs-tasks { padding-left:20px; }
+.hs-tasks li { margin-bottom:10px; color:var(--ink); font-size:14.5px; line-height:1.6; }
+.hs-tasks li strong { font-family:'Bricolage Grotesque',sans-serif; color:#6b21a8; }
+
+table { width:100%; border-collapse:collapse; margin:24px 0; font-size:13.5px; }
+thead th { background:var(--ink); color:white; padding:10px 14px; text-align:left; font-family:'Bricolage Grotesque',sans-serif; font-weight:700; font-size:13px; }
+tbody td { padding:11px 14px; border-bottom:1px solid var(--border); color:var(--ink); vertical-align:top; line-height:1.5; }
+tbody tr:nth-child(even) td { background:var(--warm); }
+
+.voting-viz { display:flex; gap:10px; margin:20px 0; flex-wrap:wrap; }
+.vote-card { border-radius:8px; padding:14px 16px; border:1px solid; font-family:'JetBrains Mono',monospace; font-size:12px; min-width:180px; }
+.vote-card.v-billing { background:rgba(37,99,175,0.08); border-color:rgba(37,99,175,0.3); color:var(--accent4); }
+.vote-card.v-tech { background:rgba(26,107,74,0.08); border-color:rgba(26,107,74,0.3); color:var(--accent); }
+.vote-card.winner { border-width:2px; position:relative; }
+.vote-card.winner::after { content:'WINNER'; position:absolute; top:-10px; right:10px; background:var(--accent); color:white; font-size:9px; padding:2px 6px; border-radius:4px; letter-spacing:1px; }
+.vote-num { font-size:24px; font-weight:700; margin-bottom:4px; }
+.vote-label { opacity:0.7; font-size:11px; }
+
+.tree-viz { margin:24px 0; }
+.tree-node { display:flex; align-items:flex-start; gap:14px; margin-bottom:16px; }
+.tree-branch { width:3px; background:var(--border); margin:0 10px; border-radius:2px; }
+.tree-card { flex:1; border-radius:8px; padding:14px 18px; border:1px solid var(--border); background:var(--warm); }
+.tree-card.selected { background:var(--win); border-color:var(--win-border); }
+.tree-card.pruned { opacity:0.5; }
+.tree-card .tc-score { font-family:'JetBrains Mono',monospace; font-size:11px; margin-bottom:6px; }
+.tree-card.selected .tc-score { color:var(--accent); }
+.tree-card .tc-title { font-family:'Bricolage Grotesque',sans-serif; font-size:14px; font-weight:700; margin-bottom:4px; }
+.tree-card p { font-size:13px; color:var(--muted); margin:0; }
+
+.quiz-section { background:var(--warm); border:2px solid var(--border); border-radius:14px; padding:32px 36px; margin:40px 0; }
+.quiz-section h3 { margin-top:0; font-family:'Bricolage Grotesque',sans-serif; font-size:22px; }
+.quiz-q { font-size:15px; font-weight:bold; margin-bottom:14px; font-family:'Bricolage Grotesque',sans-serif; margin-top:24px; }
+.q-options { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+.q-opt { background:white; border:1.5px solid var(--border); border-radius:8px; padding:10px 14px; cursor:pointer; font-size:14px; text-align:left; font-family:'Lora',serif; transition:all .2s; width:100%; color:var(--ink); }
+.q-opt:hover { border-color:var(--accent); background:var(--win); }
+.q-opt.correct { background:var(--win); border-color:var(--accent); color:#166534; }
+.q-opt.wrong { background:var(--pain); border-color:var(--accent2); color:#991b1b; }
+.q-feedback { font-size:13.5px; padding:10px 14px; border-radius:6px; display:none; font-family:'Bricolage Grotesque',sans-serif; line-height:1.5; margin-top:4px; }
+.q-feedback.show { display:block; }
+.q-feedback.ok { background:var(--win); color:#166534; border:1px solid var(--win-border); }
+.q-feedback.no { background:var(--pain); color:#991b1b; border:1px solid var(--pain-border); }
+
+.next-teaser { background:var(--ink); color:white; border-radius:14px; padding:36px 40px; margin:48px 0 0; position:relative; overflow:hidden; }
+.next-teaser::before { content:''; position:absolute; top:-60px; right:-60px; width:200px; height:200px; background:radial-gradient(circle, rgba(26,107,74,0.25) 0%, transparent 70%); border-radius:50%; }
+.next-teaser .nt-label { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--code-green); letter-spacing:3px; text-transform:uppercase; margin-bottom:12px; }
+.next-teaser h3 { font-family:'Bricolage Grotesque',sans-serif; font-size:24px; font-weight:800; color:white; margin:0 0 16px; }
+.next-teaser p { color:rgba(255,255,255,0.6); font-size:15px; }
+.next-teaser .cliffhanger { color:var(--code-green); font-style:italic; font-size:16px; margin-top:16px; border-top:1px solid rgba(255,255,255,0.1); padding-top:16px; }
+
+.ch-nav { display:flex; gap:12px; margin-top:48px; padding-top:32px; border-top:1px solid var(--border); }
+.ch-btn { flex:1; padding:14px 20px; border-radius:8px; border:1.5px solid var(--border); background:none; cursor:pointer; font-family:'Bricolage Grotesque',sans-serif; font-size:14px; font-weight:700; transition:all .2s; text-align:left; color:var(--ink); }
+.ch-btn.primary { background:var(--ink); color:white; border-color:var(--ink); text-align:right; }
+.ch-btn:hover:not(.primary) { background:var(--warm); }
+.ch-btn.primary:hover { background:var(--accent); border-color:var(--accent); }
+.ch-btn small { display:block; font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:400; color:var(--muted); margin-bottom:4px; }
+.ch-btn.primary small { color:rgba(255,255,255,0.5); }
+
+ul, ol { padding-left:22px; color:var(--ink); line-height:1.9; font-size:15px; margin-bottom:16px; }
+li { margin-bottom:4px; }
+strong { font-family:'Bricolage Grotesque',sans-serif; }
+
+.inline-label { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; padding:2px 7px; border-radius:4px; letter-spacing:1px; text-transform:uppercase; font-weight:600; }
+.label-pain { background:#fee2e2; color:var(--accent2); }
+.label-fix { background:#d1fae5; color:#065f46; }
+.label-think { background:#ede9fe; color:#5b21b6; }
+
+.accuracy-bar { margin:16px 0; }
+.acc-label { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted); margin-bottom:6px; }
+.acc-track { height:24px; background:var(--surface); border-radius:6px; overflow:hidden; position:relative; }
+.acc-fill { height:100%; border-radius:6px; display:flex; align-items:center; padding-left:12px; font-family:'JetBrains Mono',monospace; font-size:12px; color:white; font-weight:600; transition:width 1s ease; }
+.acc-fill.basic { background:linear-gradient(90deg, #c94040, #e07050); }
+.acc-fill.few-shot { background:linear-gradient(90deg, #c27c2a, #e0a040); }
+.acc-fill.cot { background:linear-gradient(90deg, #2563af, #4080d0); }
+.acc-fill.sc { background:linear-gradient(90deg, #1a6b4a, #2a9d70); }
+
+@media (max-width:640px) {
+  .compare { grid-template-columns:1fr; }
+  .ch-title { font-size:30px; }
+  .chapter { padding:48px 20px 80px; }
+  .voting-viz { flex-direction:column; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-strip"><div class="progress-fill" id="pf"></div></div>
+
+<nav class="topnav">
+  <span class="nav-session-label">Session 4</span>
+  <div class="nav-chapters">
+    <button class="nav-ch active" onclick="goTo(0)">Ch.1 Where We Left Off</button>
+    <button class="nav-ch" onclick="goTo(1)">Ch.2 Why Basic Fails</button>
+    <button class="nav-ch" onclick="goTo(2)">Ch.3 Chain of Thought</button>
+    <button class="nav-ch" onclick="goTo(3)">Ch.4 CoT Variants</button>
+    <button class="nav-ch" onclick="goTo(4)">Ch.5 Self-Consistency</button>
+    <button class="nav-ch" onclick="goTo(5)">Ch.6 Tree of Thought</button>
+    <button class="nav-ch" onclick="goTo(6)">Ch.7 Full System</button>
+    <button class="nav-ch" onclick="goTo(7)">Ch.8 Why LangChain</button>
+    <button class="nav-ch" onclick="goTo(8)">🧠 Quiz</button>
+  </div>
+  <span class="nav-right" id="ch-counter">1 / 9</span>
+</nav>
+
+<main class="main">
+
+<!-- ══════ CH 1: WHERE WE LEFT OFF ══════ -->
+<div class="chapter active" id="ch0">
+  <div class="ch-hero">
+    <div class="ch-number">// Chapter 1 — The Story Continues</div>
+    <h1 class="ch-title">Our classifier has<br>a <span class="accent2">20% failure rate.</span><br>Let's fix it.</h1>
+    <p class="ch-subtitle">Session 3 ended with a working classifier. Good structure, few-shot examples, dynamic prompts. 80% accurate. But Priya just showed you the failures — and they're the ones that matter most.</p>
+    <div class="ch-objectives">
+      <div class="obj-title">// Session 4 Objectives</div>
+      <ul>
+        <li>Understand exactly why basic prompting fails on complex reasoning tasks</li>
+        <li>Master Chain of Thought (Zero-Shot CoT, Few-Shot CoT, Auto-CoT) with real email examples</li>
+        <li>Use Self-Consistency to eliminate the "sometimes wrong, sometimes right" problem</li>
+        <li>Apply Tree of Thought for multi-path reasoning in ambiguous cases</li>
+        <li>Build an accuracy progression: 80% → 95% through technique stacking</li>
+        <li>Understand exactly why plain Python + OpenAI SDK breaks at scale — and why LangChain is the answer</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="recall-box">
+    <p>In Session 3, you built a dynamic email classifier using the OpenAI SDK. It uses 4 prompt components, proper structuring, few-shot examples, and handles the Loss in Middle bug. It correctly classifies ~80% of emails. The remaining 20%? They're all <strong>ambiguous, multi-issue, or require reasoning chains</strong> — not just pattern matching.</p>
+  </div>
+
+  <h2>The Emails That Are Still Breaking</h2>
+
+  <p>Priya pulled the last week's misclassified tickets. Let's look at the 3 failure patterns:</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">failure_cases.txt</span><span class="code-tag pain-tag">MISCLASSIFIED</span></div>
+    <div class="code-body"><pre><span class="ck">── FAILURE TYPE 1: Multi-Layer Issues ──</span>
+Email: "I can't login and I already paid for the annual plan last week. 
+       Is my account suspended? I have a client demo tomorrow."
+<span class="cr">Your classifier said:</span> {"category": "Technical", "urgency": "High"}
+<span class="cg">Should have been:</span>    {"category": "Billing", "urgency": "High",
+                     "billing_sub": "Account Access / Payment Linked"}
+<span class="ck"># Why it failed: Surface keywords "can't login" → Technical.
+# But the REAL issue: payment → account suspension → login failure.
+# Billing team needs to fix this, not tech support.</span>
+
+<span class="ck">── FAILURE TYPE 2: Implicit Urgency ──</span>
+Email: "Quick question — when will the API rate limits reset? 
+       We're processing payroll for 5000 employees tonight."
+<span class="cr">Your classifier said:</span> {"category": "Technical", "urgency": "Medium"}
+<span class="cg">Should have been:</span>    {"category": "Technical", "urgency": "High"}
+<span class="ck"># Why it failed: "Quick question" signals low urgency.
+# But "payroll for 5000 employees tonight" = business-critical deadline.
+# Model needs to REASON about business context, not just detect words.</span>
+
+<span class="ck">── FAILURE TYPE 3: Strategic Emails ──</span>
+Email: "We're evaluating whether to stay on your platform or move to 
+       Competitor X. The main blockers are: (1) missing Zapier integration, 
+       (2) no bulk export feature, (3) pricing jumped 40% last renewal."
+<span class="cr">Your classifier said:</span> {"category": "Feature Request", "urgency": "Low"}
+<span class="cg">Should have been:</span>    {"category": "Billing", "urgency": "High"}
+<span class="ck"># Why it failed: 2 of 3 points are feature requests → mode wins.
+# But this is a CHURN RISK email. The 40% price hike is the real issue.
+# Needs escalation to Account Management, not just a feature ticket.</span></pre></div>
+  </div>
+
+  <div class="pain-box">
+    <div class="pain-label">Root Cause</div>
+    <p>All three failures share the same problem: the model is <strong>pattern matching on surface-level keywords</strong> instead of <em>reasoning about what the email actually means</em>. It sees "can't login" → Technical. It doesn't ask: "Why can't they login? What led to this?"</p>
+    <p>Basic prompting gives the model a template to fill. Advanced prompting gives the model a way to <strong>think</strong>.</p>
+  </div>
+
+  <div class="accuracy-bar">
+    <div class="acc-label">Current classifier accuracy after Session 3</div>
+    <div class="acc-track"><div class="acc-fill basic" style="width:80%">80% — Basic Prompting</div></div>
+  </div>
+  <p style="font-size:14px; color:var(--muted)">Target by end of Session 4: 95%+. Let's get there.</p>
+
+  <div class="ch-nav">
+    <div></div>
+    <button class="ch-btn primary" onclick="goTo(1)"><small>Next →</small>Why Basic Prompting Fails</button>
+  </div>
+</div>
+
+<!-- ══════ CH 2: WHY BASIC FAILS ══════ -->
+<div class="chapter" id="ch1">
+  <div class="ch-hero">
+    <div class="ch-number">// Chapter 2</div>
+    <h1 class="ch-title">Why <span class="accent2">Pattern Matching</span><br>isn't enough</h1>
+    <p class="ch-subtitle">Before we introduce Chain of Thought, we need to deeply understand what's missing. The model isn't "dumb" — it's reasoning at the wrong level.</p>
+  </div>
+
+  <h2>The Intern Test</h2>
+
+  <div class="story-box">
+    <div class="story-label">Thought Experiment</div>
+    <p>You have two interns. You give both the same email: <em>"I can't login and I already paid for annual plan last week."</em></p>
+    <p><strong>Intern A</strong> (pattern matcher) reads it and says: "Login problem → Technical." Done. 3 seconds.</p>
+    <p><strong>Intern B</strong> (reasoner) thinks out loud: "They paid last week. This is a recent payment. If there's a payment processing delay, the account might not have been activated yet. So this is technically a login failure, but the root cause is billing. The billing team would need to manually activate the account. I'll classify as Billing."</p>
+    <p>Who do you trust with real tickets? <strong>Intern B every time.</strong> Chain of Thought teaches the AI to be Intern B.</p>
+  </div>
+
+  <h2>5 Specific Failure Modes</h2>
+
+  <div class="evolution">
+    <div class="evo-step">
+      <div class="evo-num pain">1</div>
+      <div class="evo-content">
+        <h4>Jumps to conclusions — no intermediate steps</h4>
+        <div class="compare">
+          <div class="compare-card bad">
+            <div class="c-label">❌ What Model Does</div>
+            <p>"can't login" → Technical. Final answer.</p>
+          </div>
+          <div class="compare-card good">
+            <div class="c-label">✅ What It Should Do</div>
+            <p>Why can't they login? → Recent payment → Account not activated? → Root cause = Billing.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="evo-step">
+      <div class="evo-num pain">2</div>
+      <div class="evo-content">
+        <h4>Can't handle multi-hop logic</h4>
+        <p>Our payroll email failure: "rate limit" → Technical. But the chain is: rate limit → blocking batch job → payroll processing → 5000 employees → tonight's deadline → HIGH urgency. The model can't connect these hops without being asked to reason step-by-step.</p>
+      </div>
+    </div>
+
+    <div class="evo-step">
+      <div class="evo-num pain">3</div>
+      <div class="evo-content">
+        <h4>Majority keyword voting — wrong for strategic emails</h4>
+        <p>The churn-risk email had: 2 feature requests + 1 billing complaint. The model counted: Feature Request wins 2-1. But importance isn't democratic — the billing issue was the escalation trigger. Without reasoning about <em>business impact</em>, it picks the most common keyword category.</p>
+      </div>
+    </div>
+
+    <div class="evo-step">
+      <div class="evo-num pain">4</div>
+      <div class="evo-content">
+        <h4>Non-deterministic on repeated runs</h4>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">inconsistency_proof.py</span></div>
+          <div class="code-body"><pre><span class="ck"># Same ambiguous email, 5 runs, temperature=0.3:</span>
+email = <span class="cy">"We're evaluating if we stay. Zapier missing, prices jumped."</span>
+
+runs = [classify(email) <span class="cb">for</span> _ <span class="cb">in</span> <span class="cg">range</span>(<span class="cm">5</span>)]
+<span class="cg">print</span>(runs)
+<span class="ck"># Output:</span>
+<span class="ck"># ["Feature Request", "Billing", "Feature Request", "Other", "Feature Request"]</span>
+<span class="ck"># Same email. 3 different categories across 5 runs. Production nightmare.</span></pre></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="evo-step">
+      <div class="evo-num pain">5</div>
+      <div class="evo-content">
+        <h4>Black box — no audit trail</h4>
+        <p>When your classifier wrongly escalates a spam email as High-urgency Billing and a senior engineer investigates — your current system just outputs <code>"Billing"</code>. There's no reasoning trace. No way to debug why. No way to improve it systematically. In production systems, <strong>explainability is not optional</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-label">💡 The Key Insight</div>
+    <p>The solution to all 5 failures is the same: <strong>make the model think before it answers.</strong> Chain of Thought is the technique that does exactly this. Let's build it.</p>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-btn" onclick="goTo(0)"><small>←</small> Where We Left Off</button>
+    <button class="ch-btn primary" onclick="goTo(2)"><small>Next →</small> Chain of Thought</button>
+  </div>
+</div>
+
+<!-- ══════ CH 3: CHAIN OF THOUGHT ══════ -->
+<div class="chapter" id="ch2">
+  <div class="ch-hero">
+    <div class="ch-number">// Chapter 3</div>
+    <h1 class="ch-title">Chain of <span class="accent">Thought</span><br>Prompting</h1>
+    <p class="ch-subtitle">We add one thing to our classifier: ask it to reason out loud before answering. This single change fixes Failure Types 1, 2, and 3. Here's exactly how to implement it.</p>
+  </div>
+
+  <div class="think-box">
+    <div class="think-label">The Core Idea</div>
+    <p><strong>Chain of Thought (CoT)</strong> prompting asks the model to produce its intermediate reasoning steps before giving the final answer. Instead of <code>email → category</code>, it becomes <code>email → reasoning → category</code>. The model that shows its work almost always gives better final answers.</p>
+  </div>
+
+  <h2>What Happens Inside the Model</h2>
+
+  <p>LLMs predict the next token. When you add <code>"Think through this step by step before classifying"</code>, the model has learned during training that this phrase is followed by structured reasoning. It shifts from <em>pattern completion mode</em> to <em>reasoning mode</em> — and the next tokens it predicts are reasoning steps rather than a quick answer.</p>
+
+  <div class="compare">
+    <div class="compare-card bad">
+      <div class="c-label">❌ Without CoT (Pattern Mode)</div>
+      <p>Model sees "can't login" → immediately predicts "Technical" as the most statistically likely next token. Fast, often wrong.</p>
+    </div>
+    <div class="compare-card good">
+      <div class="c-label">✅ With CoT (Reasoning Mode)</div>
+      <p>Model predicts a reasoning chain first: "They mention a recent payment... account activation... root cause = Billing..." Then predicts "Billing" as the answer.</p>
+    </div>
+  </div>
+
+  <h2>Fixing Failure Type 1 with Zero-Shot CoT</h2>
+
+  <p>The simplest form: add "Think step by step" — no examples needed.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">zero_shot_cot_classifier.py</span><span class="code-tag think-tag">CHAIN OF THOUGHT</span></div>
+    <div class="code-body"><pre><span class="cb">def</span> <span class="cg">classify_with_zs_cot</span>(subject, sender, body):
+    prompt = <span class="cy">f"""CRITICAL: Follow the exact output format below.
+
+# ROLE
+You are a senior support email analyst at a B2B SaaS company.
+You understand that support emails often have surface symptoms 
+and underlying root causes that may be in different departments.
+
+# TASK
+Classify the email. Before giving your final answer, reason through 
+the email carefully using these questions:
+1. What is the customer's SURFACE complaint? (what they say)
+2. What is the ROOT CAUSE? (what actually caused this)
+3. Which team needs to ACT? (who can actually fix this)
+4. What is the BUSINESS IMPACT if this isn't resolved in 2 hours?
+
+# CATEGORIES: Billing | Technical | Feature Request | Spam | Other
+# URGENCY: High | Medium | Low
+
+# OUTPUT FORMAT
+Return EXACTLY this structure:
+THINKING:
+- Surface complaint: [1 sentence]
+- Root cause: [1 sentence]  
+- Team that should act: [team name]
+- Business impact: [1 sentence]
+
+CLASSIFICATION:
+{{"category": "...", "urgency": "...", "billing_sub": "..."}}
+
+# EMAIL TO CLASSIFY
+Subject: {subject}
+From: {sender}
+Body: {body}
+
+REMINDER: THINKING section first, then CLASSIFICATION JSON."""</span>
+    
+    response = client.chat.completions.create(
+        model=<span class="cy">"gpt-4o-mini"</span>,
+        messages=[{<span class="cy">"role"</span>: <span class="cy">"user"</span>, <span class="cy">"content"</span>: prompt}],
+        temperature=<span class="cm">0</span>
+    )
+    <span class="cb">return</span> response.choices[<span class="cm">0</span>].message.content</pre></div>
+  </div>
+
+  <p>Now let's run it on our Failure Type 1 email:</p>
+
+  <div class="output-block think">
+    <div class="out-label">CoT Output — "Can't login + paid for annual plan"</div>
+    <pre>THINKING:
+- Surface complaint: Customer cannot login to the platform.
+- Root cause: Customer made an annual payment last week — likely a 
+  payment processing delay or manual activation required for annual plans.
+  The login failure is a symptom of the account not being activated 
+  post-payment, not a technical bug.
+- Team that should act: Billing team (to verify payment and activate account).
+  Tech team cannot fix this — there is no bug.
+- Business impact: Customer with annual commitment cannot access product. 
+  Risk of immediate churn and refund request if not resolved in 2 hours.
+
+CLASSIFICATION:
+{"category": "Billing", "urgency": "High", "billing_sub": "Account Activation"}</pre>
+  </div>
+
+  <div class="win-box">
+    <div class="win-label">What Changed</div>
+    <p>The CoT reasoning exposed that "can't login" was a <em>symptom</em>, not the root cause. The model now routes to Billing because it <strong>reasoned through the causal chain</strong>, not just matched "login" to "Technical". This is the difference between a junior and senior support analyst.</p>
+  </div>
+
+  <div class="handson">
+    <div class="hs-title">💻 Hands-On Exercise 6</div>
+    <div class="hs-subtitle">// Zero-Shot CoT — 25 minutes</div>
+    <ul class="hs-tasks">
+      <li><strong>Task 1:</strong> Implement <code>classify_with_zs_cot</code> above. Run it on all 3 failure cases from Chapter 1. Does it fix them?</li>
+      <li><strong>Task 2:</strong> Compare outputs: run both the old classifier (no CoT) and new CoT classifier on the same 10 emails. Count accuracy improvement.</li>
+      <li><strong>Task 3:</strong> The THINKING section is useful for debugging but you don't want to store it in your database. Write a <code>parse_cot_output(response_text)</code> function that extracts only the JSON from the CLASSIFICATION section.</li>
+      <li><strong>Task 4 (Edge case):</strong> What happens if the model outputs THINKING but then gives wrong JSON? How would you handle that error in production?</li>
+    </ul>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-btn" onclick="goTo(1)"><small>←</small> Why Basic Fails</button>
+    <button class="ch-btn primary" onclick="goTo(3)"><small>Next →</small> CoT Variants</button>
+  </div>
+</div>
+
+<!-- ══════ CH 4: COT VARIANTS ══════ -->
+<div class="chapter" id="ch3">
+  <div class="ch-hero">
+    <div class="ch-number">// Chapter 4</div>
+    <h1 class="ch-title">CoT Variants:<br><span class="accent">Few-Shot</span> & <span class="accent4">Auto-CoT</span></h1>
+    <p class="ch-subtitle">Zero-Shot CoT fixed the multi-layer failures. But your fintech client's emails still confuse the model — their domain terms don't appear in any CoT reasoning pattern the model learned. Time for Few-Shot CoT.</p>
+  </div>
+
+  <div class="story-box">
+    <div class="story-label">New Client, New Problem</div>
+    <p>You've deployed your CoT classifier at a fintech payment gateway. The first week shows a problem: The model's CoT reasoning is confidently wrong on domain-specific terms. It sees "NACH mandate" and reasons: <em>"This is a technical mandate from the customer... probably Technical."</em> Completely wrong. NACH = National Automated Clearing House = a payment instrument = Billing.</p>
+    <p>Zero-Shot CoT can only reason using knowledge from training. Your domain knowledge isn't there. <strong>You need to teach it through examples.</strong></p>
+  </div>
+
+  <h2>Few-Shot CoT — Teaching Reasoning Patterns</h2>
+
+  <p>Instead of just giving examples of correct classifications (what we did in Session 3), now we give examples of <strong>correct reasoning + correct classification</strong>.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">few_shot_cot_classifier.py</span><span class="code-tag think-tag">FEW-SHOT COT</span></div>
+    <div class="code-body"><pre><span class="cb">def</span> <span class="cg">build_few_shot_cot_prompt</span>(subject, body):
+    
+    <span class="ck"># These examples show REASONING + ANSWER together</span>
+    <span class="ck"># Notice: we're not just showing what the answer is</span>
+    <span class="ck"># We're showing HOW to think about this type of email</span>
+    
+    cot_examples = <span class="cy">"""
+EXAMPLE 1:
+Subject: NACH mandate registration failed
+Body: Our NACH mandate for auto-debit failed. Customer accounts 
+cannot be debited for EMI this month.
+
+THINKING:
+- Surface complaint: NACH mandate registration failure.
+- Root cause: NACH = National Automated Clearing House, a payment 
+  collection instrument. Failure = payment collection blocked for 
+  all customers using this mandate. This is a payment infrastructure issue.
+- Team that should act: Payments/Billing team — specifically the 
+  payment gateway integration team.
+- Business impact: Multiple customer EMIs will fail today. Revenue 
+  loss + customer escalations expected within hours.
+
+CLASSIFICATION:
+{"category": "Transaction Failed", "urgency": "Critical"}
+
+---
+
+EXAMPLE 2:
+Subject: UPI reversal not credited back
+Body: I did a UPI payment 3 days ago. It failed but the amount 
+was deducted. Not refunded yet.
+
+THINKING:
+- Surface complaint: Payment deducted but service not received.
+- Root cause: UPI reversal (failed transaction refund) not processed 
+  within standard T+3 timeline. This is a settlement/reconciliation issue.
+- Team that should act: Finance/Settlement team — check bank reconciliation 
+  and trigger manual refund if auto-reversal stuck.
+- Business impact: Customer's money held for 3+ days = regulatory risk + 
+  customer churn if not resolved today.
+
+CLASSIFICATION:
+{"category": "Settlement Delay", "urgency": "High"}
+
+---
+
+EXAMPLE 3:  
+Subject: KYC documents rejected again
+Body: Our KYC was rejected for the 3rd time. We submitted Aadhaar, 
+PAN, and GST certificate. What else do you need?
+
+THINKING:
+- Surface complaint: KYC documents repeatedly rejected.
+- Root cause: Either unclear document requirements OR automated KYC 
+  system mis-rejecting valid documents. Customer frustration high.
+- Team that should act: KYC/Compliance team — needs manual review, 
+  and possibly update to rejection reason communication.
+- Business impact: Customer cannot go live. Blocking revenue for both 
+  parties. Risk of customer choosing competitor.
+
+CLASSIFICATION:
+{"category": "KYC Issue", "urgency": "High"}
+"""</span>
+    
+    <span class="cb">return</span> <span class="cy">f"""CRITICAL: Return THINKING section then CLASSIFICATION JSON only.
+
+# ROLE
+You are a senior support analyst at a payment gateway company in India.
+You deeply understand Indian fintech: UPI, NACH, NEFT, IMPS, KYC, GST.
+
+# CATEGORIES: Transaction Failed | Settlement Delay | KYC Issue | Fraud Alert | Other
+# URGENCY: Critical | High | Medium
+
+# EXAMPLES — Study these reasoning patterns:
+{cot_examples}
+
+# NOW CLASSIFY THIS EMAIL  
+Follow the EXACT same THINKING + CLASSIFICATION format.
+
+Subject: {subject}
+Body: {body}"""</span></pre></div>
+  </div>
+
+  <div class="output-block think">
+    <div class="out-label">Output — "NACH mandate" email after Few-Shot CoT</div>
+    <pre>THINKING:
+- Surface complaint: NACH mandate registration failed.
+- Root cause: NACH is a payment collection mechanism. Failed 
+  registration means auto-debits for EMI payments will not work 
+  for the customer's end-users. This is a payment infrastructure failure.
+- Team that should act: Payments team — investigate with banking partner 
+  for NACH registration status and retry or escalate to NPCI.
+- Business impact: All EMI collections blocked. Potential revenue loss 
+  in crores if not resolved today. Regulatory SLA breach risk.
+
+CLASSIFICATION:
+{"category": "Transaction Failed", "urgency": "Critical"}</pre>
+  </div>
+
+  <h2>Auto-CoT — When You Have Too Many Categories</h2>
+
+  <p>Your fintech client now has 12 email categories. Writing Few-Shot CoT examples for all 12 combinations takes hours. <strong>Auto-CoT makes the model generate its own reasoning examples first, then classify.</strong></p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">auto_cot_classifier.py</span><span class="code-tag think-tag">AUTO-COT</span></div>
+    <div class="code-body"><pre><span class="cb">def</span> <span class="cg">auto_cot_classify</span>(email_subject, email_body):
+    
+    <span class="ck">### PHASE 1: Model generates its own reasoning warm-up ###</span>
+    warmup_prompt = <span class="cy">"""You are a fintech support analyst. 
+    
+Before I give you a real email to classify, I want you to demonstrate 
+your reasoning ability. Generate 3 different example emails a fintech 
+support team might receive, and show step-by-step how you would 
+classify each one. 
+
+Cover different categories: payment failures, KYC issues, and fraud alerts.
+
+Format each as:
+EXAMPLE [N]:
+Email: [email text you invent]
+Reasoning: [step-by-step thinking]
+Classification: [category + urgency]"""</span>
+    
+    <span class="ck"># Get the model's self-generated examples</span>
+    warmup_response = client.chat.completions.create(
+        model=<span class="cy">"gpt-4o-mini"</span>,
+        messages=[{<span class="cy">"role"</span>: <span class="cy">"user"</span>, <span class="cy">"content"</span>: warmup_prompt}],
+        temperature=<span class="cm">0.3</span>  <span class="ck"># slight randomness for diverse examples</span>
+    )
+    self_examples = warmup_response.choices[<span class="cm">0</span>].message.content
+    
+    <span class="ck">### PHASE 2: Use those examples to classify real email ###</span>
+    classify_prompt = <span class="cy">f"""You are a fintech support analyst.
+
+You just demonstrated your reasoning ability with these examples:
+{self_examples}
+
+Now apply the SAME reasoning pattern to this real email:
+
+Subject: {email_subject}
+Body: {email_body}
+
+Follow the same format: Reasoning → Classification JSON."""</span>
+    
+    classify_response = client.chat.completions.create(
+        model=<span class="cy">"gpt-4o-mini"</span>,
+        messages=[{<span class="cy">"role"</span>: <span class="cy">"user"</span>, <span class="cy">"content"</span>: classify_prompt}],
+        temperature=<span class="cm">0</span>
+    )
+    <span class="cb">return</span> classify_response.choices[<span class="cm">0</span>].message.content
+
+<span class="ck"># Auto-CoT = model teaches itself → model applies to real case
+# Eliminates hours of manual example writing
+# Trade-off: slightly more expensive (2 API calls per classification)</span></pre></div>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-label">💡 When to Use Which CoT Type</div>
+    <ul>
+      <li><strong>Zero-Shot CoT:</strong> General emails where the model has enough domain knowledge. "Think step by step" is usually enough.</li>
+      <li><strong>Few-Shot CoT:</strong> Domain-specific emails with terminology the model hasn't learned (fintech, healthcare, legal). Give it 3-5 reasoning examples.</li>
+      <li><strong>Auto-CoT:</strong> When you have many categories and can't manually write examples for all. Let the model warm up first. Costs 2 API calls.</li>
+    </ul>
+  </div>
+
+  <div class="handson">
+    <div class="hs-title">💻 Hands-On Exercise 7</div>
+    <div class="hs-subtitle">// Few-Shot CoT & Auto-CoT — 30 minutes</div>
+    <ul class="hs-tasks">
+      <li><strong>Task 1:</strong> Implement <code>build_few_shot_cot_prompt</code> for your chosen domain from Exercise 5 (e-commerce, HR, healthcare). Write 3 domain-specific reasoning examples.</li>
+      <li><strong>Task 2:</strong> Implement Auto-CoT. Run Phase 1 and print the self-generated examples. Are they good? How would you filter out bad ones?</li>
+      <li><strong>Task 3:</strong> Cost comparison: Zero-Shot CoT = 1 API call. Auto-CoT = 2 API calls. If you process 1000 emails/day and gpt-4o-mini costs $0.15/1M tokens, what's the daily cost difference? When is Auto-CoT worth it?</li>
+    </ul>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-btn" onclick="goTo(2)"><small>←</small> Chain of Thought</button>
+    <button class="ch-btn primary" onclick="goTo(4)"><small>Next →</small> Self-Consistency</button>
+  </div>
+</div>
+
+<!-- ══════ CH 5: SELF-CONSISTENCY ══════ -->
+<div class="chapter" id="ch4">
+  <div class="ch-hero">
+    <div class="ch-number">// Chapter 5</div>
+    <h1 class="ch-title">Self-<span class="accent">Consistency</span></h1>
+    <p class="ch-subtitle">CoT improved accuracy significantly. But you discover a new problem: on ambiguous emails, the model's answer changes between runs. Same email, different classification. You need reliability, not just reasoning.</p>
+  </div>
+
+  <div class="story-box">
+    <div class="story-label">The Reliability Bug</div>
+    <p>You add monitoring to your classifier. Over 3 days, you notice: for 8% of emails, running the same prompt twice gives different answers. One ambiguous email gets classified "Billing" on Monday, "Technical" on Tuesday. The support routing is inconsistent. An Enterprise client notices.</p>
+    <p>Your CoT reasoning is good — but LLMs are probabilistic. Even at temperature=0, slightly different email phrasings or model version updates can cause drift. <strong>You need a way to get stable answers on ambiguous cases.</strong></p>
+  </div>
+
+  <div class="think-box">
+    <div class="think-label">The Solution</div>
+    <p><strong>Self-Consistency:</strong> Run the same prompt multiple times (with slight randomness), collect all answers, and pick the one that appears most frequently. If the model is right, it will be consistently right. If it's uncertain, you can detect and handle that uncertainty.</p>
+  </div>
+
+  <h2>Implementing Self-Consistency for the Classifier</h2>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">self_consistency_classifier.py</span><span class="code-tag think-tag">SELF-CONSISTENCY</span></div>
+    <div class="code-body"><pre><span class="cb">from</span> collections <span class="cb">import</span> Counter
+<span class="cb">import</span> json, re
+
+<span class="cb">def</span> <span class="cg">classify_with_self_consistency</span>(subject, body, n_runs=<span class="cm">5</span>):
+    <span class="cy">"""
+    Run classifier N times, return majority answer.
+    Also returns confidence score and whether human review is needed.
+    """</span>
+    results = []
+    raw_outputs = []
+    
+    <span class="cb">for</span> run <span class="cb">in</span> <span class="cg">range</span>(n_runs):
+        <span class="ck"># Use temperature > 0 to get variation in reasoning paths</span>
+        <span class="ck"># Different paths, same right answer = high confidence</span>
+        response = client.chat.completions.create(
+            model=<span class="cy">"gpt-4o-mini"</span>,
+            messages=[{
+                <span class="cy">"role"</span>: <span class="cy">"user"</span>,
+                <span class="cy">"content"</span>: build_cot_prompt(subject, body)
+            }],
+            temperature=<span class="cm">0.3</span>  <span class="ck"># slight randomness = different reasoning paths</span>
+        )
+        
+        raw = response.choices[<span class="cm">0</span>].message.content
+        raw_outputs.append(raw)
+        
+        <span class="ck"># Extract the JSON from CoT output</span>
+        json_match = re.search(<span class="cy">r'\{[^}]+\}'</span>, raw)
+        <span class="cb">if</span> json_match:
+            <span class="cb">try</span>:
+                parsed = json.loads(json_match.group())
+                results.append(parsed.get(<span class="cy">"category"</span>, <span class="cy">"Unknown"</span>))
+            <span class="cb">except</span>:
+                results.append(<span class="cy">"ParseError"</span>)
+    
+    <span class="ck"># Count votes</span>
+    vote_counts = Counter(results)
+    winner = vote_counts.most_common(<span class="cm">1</span>)[<span class="cm">0</span>]
+    winner_category, winner_votes = winner
+    
+    confidence = winner_votes / n_runs  <span class="ck"># e.g. 4/5 = 80% confidence</span>
+    needs_review = confidence < <span class="cm">0.6</span>     <span class="ck"># flag if no clear majority</span>
+    
+    <span class="cb">return</span> {
+        <span class="cy">"category"</span>: winner_category,
+        <span class="cy">"confidence"</span>: f<span class="cy">"{confidence:.0%}"</span>,
+        <span class="cy">"vote_breakdown"</span>: <span class="gf">dict</span>(vote_counts),
+        <span class="cy">"needs_human_review"</span>: needs_review,
+        <span class="cy">"reasoning_traces"</span>: raw_outputs  <span class="ck"># audit trail!</span>
+    }
+
+<span class="ck"># Test on the churn-risk email:</span>
+result = classify_with_self_consistency(
+    subject=<span class="cy">"Evaluating if we stay on your platform"</span>,
+    body=<span class="cy">"Zapier missing, bulk export missing, prices jumped 40%."</span>,
+    n_runs=<span class="cm">5</span>
+)
+<span class="cg">print</span>(result)</pre></div>
+  </div>
+
+  <h2>Reading the Votes — Visual Example</h2>
+
+  <p>For our churn-risk email (5 runs, temperature=0.3):</p>
+
+  <div class="voting-viz">
+    <div class="vote-card v-billing winner">
+      <div class="vote-num">4</div>
+      <div class="vote-label">Billing — 80% confident</div>
+    </div>
+    <div class="vote-card v-tech">
+      <div class="vote-num">1</div>
+      <div class="vote-label">Feature Request</div>
+    </div>
+  </div>
+
+  <div class="output-block good">
+    <div class="out-label">Self-Consistency Final Output</div>
+    <pre>{
+  "category": "Billing",
+  "confidence": "80%",
+  "vote_breakdown": {"Billing": 4, "Feature Request": 1},
+  "needs_human_review": false,
+  "reasoning_traces": ["...run 1 THINKING...", "...run 2..."]
+}</pre>
+  </div>
+
+  <div class="win-box">
+    <div class="win-label">What Self-Consistency Adds</div>
+    <ul>
+      <li><strong>Stability:</strong> 4/5 runs agree = you can trust this classification</li>
+      <li><strong>Confidence score:</strong> Quantified uncertainty — route low-confidence tickets to human review</li>
+      <li><strong>Audit trail:</strong> 5 reasoning traces means debugging is now possible</li>
+      <li><strong>Graceful degradation:</strong> When genuinely ambiguous, <code>needs_human_review: true</code> instead of silently wrong</li>
+    </ul>
+  </div>
+
+  <h2>Cost vs. Quality Trade-off</h2>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">cost_analysis.py</span></div>
+    <div class="code-body"><pre><span class="ck"># Don't run Self-Consistency on every email — it's 5x the cost.
+# Smart approach: tiered processing</span>
+
+<span class="cb">def</span> <span class="cg">smart_classify</span>(email):
+    <span class="ck"># Step 1: Try single CoT run first</span>
+    first_result = classify_with_cot(email)
+    
+    <span class="ck"># Step 2: Only use Self-Consistency if:</span>
+    <span class="ck"># - Category is ambiguous (Billing vs Technical crossover)</span>
+    <span class="ck"># - Sender is from a high-value account</span>
+    <span class="ck"># - The word "cancel" or "competitor" appears in body</span>
+    
+    triggers_sc = (
+        first_result[<span class="cy">"category"</span>] <span class="cb">in</span> [<span class="cy">"Other"</span>, <span class="cy">"Billing"</span>]
+        <span class="cb">or</span> <span class="cy">"cancel"</span> <span class="cb">in</span> email.body.lower()
+        <span class="cb">or</span> is_enterprise_customer(email.sender)
+    )
+    
+    <span class="cb">if</span> triggers_sc:
+        <span class="ck"># Worth 5 API calls for high-stakes emails</span>
+        <span class="cb">return</span> classify_with_self_consistency(email, n_runs=<span class="cm">5</span>)
+    <span class="cb">else</span>:
+        <span class="cb">return</span> first_result  <span class="ck"># Single CoT is fine for clear-cut emails</span>
+
+<span class="ck"># Result: 80% of emails use 1 API call. 20% use 5. 
+# Average: 1.8 calls/email instead of 5. 
+# Quality gain where it matters most.</span></pre></div>
+  </div>
+
+  <div class="handson">
+    <div class="hs-title">💻 Hands-On Exercise 8</div>
+    <div class="hs-subtitle">// Self-Consistency — 30 minutes</div>
+    <ul class="hs-tasks">
+      <li><strong>Task 1:</strong> Implement <code>classify_with_self_consistency</code>. Run it on the 3 failure emails from Chapter 1. What confidence scores do you get?</li>
+      <li><strong>Task 2:</strong> Test with n_runs = 3, 5, and 7. At what point does accuracy plateau? Is 7 worth the extra cost?</li>
+      <li><strong>Task 3:</strong> Implement <code>smart_classify</code> with the tiered approach. What's your trigger logic for when to run 5 calls vs 1?</li>
+      <li><strong>Task 4 (Hard):</strong> Build a simple accuracy test: 20 labelled emails. Run smart_classify on all. How many were <code>needs_human_review: true</code>? Were they actually the hard cases?</li>
+    </ul>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-btn" onclick="goTo(3)"><small>←</small> CoT Variants</button>
+    <button class="ch-btn primary" onclick="goTo(5)"><small>Next →</small> Tree of Thought</button>
+  </div>
+</div>
+
+<!-- ══════ CH 6: TREE OF THOUGHT ══════ -->
+<div class="chapter" id="ch5">
+  <div class="ch-hero">
+    <div class="ch-number">// Chapter 6</div>
+    <h1 class="ch-title">Tree of<br><span class="accent4">Thought</span></h1>
+    <p class="ch-subtitle">Self-Consistency handles ambiguous emails by running the same reasoning 5 times. But some emails need a fundamentally different approach — they need to explore multiple interpretations simultaneously and pick the best one.</p>
+  </div>
+
+  <div class="story-box">
+    <div class="story-label">A New Use Case: Response Drafting</div>
+    <p>Priya: <em>"Now that we classify emails reliably, can we also auto-draft responses for the support team? They still need to write each reply manually."</em></p>
+    <p>This is a different problem. Classification has one right answer. Drafting a response has <strong>many valid approaches</strong> — empathetic vs. direct, detailed vs. concise, offering refund vs. asking for more info. Self-Consistency can't help — it votes on one right answer. You need to <strong>explore multiple paths, evaluate each, and pick the best</strong>. That's Tree of Thought.</p>
+  </div>
+
+  <div class="think-box">
+    <div class="think-label">Tree of Thought Defined</div>
+    <p><strong>Tree of Thought (ToT)</strong> prompts the model to generate multiple reasoning <em>branches</em>, evaluate each branch for quality/suitability, and then select (or combine) the best path. Unlike CoT's linear reasoning, ToT explores the solution space before committing.</p>
+  </div>
+
+  <h2>ToT for Response Drafting</h2>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">tree_of_thought_drafter.py</span><span class="code-tag think-tag">TREE OF THOUGHT</span></div>
+    <div class="code-body"><pre><span class="cb">def</span> <span class="cg">draft_response_with_tot</span>(email, classification):
+    prompt = <span class="cy">f"""You are a senior support manager at a B2B SaaS company.
+A customer sent this email and it was classified as:
+Category: {classification['category']}, Urgency: {classification['urgency']}
+
+Customer email:
+Subject: {email['subject']}
+Body: {email['body']}
+
+Your task: Draft a response. But first, explore 3 DIFFERENT response strategies.
+For each strategy, write the draft AND score it.
+
+STRATEGY 1: Immediate Action
+- Draft: [Write the response using this approach]
+- Score: X/10 — reason why this score
+
+STRATEGY 2: Empathetic + Diagnostic  
+- Draft: [Write the response using this approach]
+- Score: X/10 — reason why this score
+
+STRATEGY 3: Escalation + Interim Relief
+- Draft: [Write the response using this approach]  
+- Score: X/10 — reason why this score
+
+SELECTED STRATEGY: [Which strategy number and why]
+
+FINAL RESPONSE:
+[The winning response — may incorporate elements from multiple strategies]"""</span>
+    
+    response = client.chat.completions.create(
+        model=<span class="cy">"gpt-4o-mini"</span>,
+        messages=[{<span class="cy">"role"</span>: <span class="cy">"user"</span>, <span class="cy">"content"</span>: prompt}],
+        temperature=<span class="cm">0.5</span>  <span class="ck"># higher temp for creative variation</span>
+    )
+    <span class="cb">return</span> response.choices[<span class="cm">0</span>].message.content</pre></div>
+  </div>
+
+  <h2>Visualizing the Tree</h2>
+
+  <p>For the churn-risk email: <em>"Evaluating if we stay. Zapier missing, prices jumped 40%."</em></p>
+
+  <div class="tree-viz">
+    <div class="tree-node">
+      <div class="tree-card" style="background:var(--warm); border-color:var(--border); max-width:200px;">
+        <div class="tc-score">ROOT</div>
+        <div class="tc-title">Churn-risk email</div>
+        <p>How do we respond?</p>
+      </div>
+    </div>
+    <div style="display:flex; gap:14px; margin-left:20px; flex-wrap:wrap;">
+      <div class="tree-card pruned" style="max-width:220px;">
+        <div class="tc-score">Branch A — Score: 4/10</div>
+        <div class="tc-title">Feature Promise</div>
+        <p>"We're adding Zapier soon! Stay with us." — Risky, uncommitted, ignores pricing.</p>
+      </div>
+      <div class="tree-card pruned" style="max-width:220px;">
+        <div class="tc-score">Branch B — Score: 6/10</div>
+        <div class="tc-title">Empathetic Listen</div>
+        <p>"We hear your concerns. Can we schedule a call?" — Safe but doesn't address urgency.</p>
+      </div>
+      <div class="tree-card selected" style="max-width:220px;">
+        <div class="tc-score">Branch C — Score: 9/10 ✓</div>
+        <div class="tc-title">Escalation + Offer</div>
+        <p>Escalate to Account Manager + pricing discussion + acknowledge Zapier gap specifically.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="output-block good">
+    <div class="out-label">ToT Final Response (Branch C selected)</div>
+    <pre>Hi [Name],
+
+Thank you for taking the time to share this feedback. I completely understand 
+your concerns, and I want to make sure we address them seriously.
+
+I'm escalating this to your dedicated Account Manager, Sarah, who will reach 
+out within the next 2 hours to discuss both the pricing concern and the 
+Zapier integration gap specifically.
+
+In the meantime — the 40% pricing increase you mentioned: I can see this was 
+your annual renewal. I'd like Sarah to walk you through our retention options 
+before you make any decisions.
+
+Regarding Zapier: I'll be transparent — it's on our Q1 roadmap but not yet 
+available. I don't want to make promises I can't keep.
+
+Can I schedule a 30-minute call for today or tomorrow?
+
+— [Your name], Senior Support</pre>
+  </div>
+
+  <div class="compare" style="margin-top:24px;">
+    <div class="compare-card bad">
+      <div class="c-label">❌ Without ToT</div>
+      <p>Model picks first reasonable response. Usually generic "thanks for feedback, we'll look into it." Customer churns.</p>
+    </div>
+    <div class="compare-card good">
+      <div class="c-label">✅ With ToT</div>
+      <p>3 strategies explored, scored, and best selected. Response addresses real churn triggers: pricing + feature gap + human escalation.</p>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-label">💡 CoT vs Self-Consistency vs ToT — When to Use Each</div>
+    <table>
+      <thead><tr><th>Scenario</th><th>Best Technique</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Standard email classification</td><td>CoT</td><td>One right answer, needs reasoning</td></tr>
+        <tr><td>Ambiguous/churn-risk emails</td><td>Self-Consistency</td><td>Need stability + confidence score</td></tr>
+        <tr><td>Drafting customer responses</td><td>Tree of Thought</td><td>Multiple valid approaches, need best one</td></tr>
+        <tr><td>Response for enterprise customer</td><td>ToT + Self-Consistency</td><td>Both quality and reliability matter</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="handson">
+    <div class="hs-title">💻 Hands-On Exercise 9</div>
+    <div class="hs-subtitle">// Tree of Thought — 35 minutes</div>
+    <ul class="hs-tasks">
+      <li><strong>Task 1:</strong> Implement <code>draft_response_with_tot</code>. Test it on 3 different classified emails. Do the 3 strategies meaningfully differ?</li>
+      <li><strong>Task 2:</strong> Modify the prompt to have the model score strategies on 2 dimensions: (a) churn prevention potential, (b) speed of resolution. How does dual-scoring change the selected strategy?</li>
+      <li><strong>Task 3 (Design):</strong> Build a simple end-to-end pipeline: email → classify (CoT) → if churn risk: draft response (ToT) → return both classification and drafted response. What's the total API call count? What's the latency?</li>
+    </ul>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-btn" onclick="goTo(4)"><small>←</small> Self-Consistency</button>
+    <button class="ch-btn primary" onclick="goTo(6)"><small>Next →</small> Full System</button>
+  </div>
+</div>
+
+<!-- ══════ CH 7: FULL SYSTEM ══════ -->
+<div class="chapter" id="ch6">
+  <div class="ch-hero">
+    <div class="ch-number">// Chapter 7</div>
+    <h1 class="ch-title">The Complete<br><span class="accent">Production System</span></h1>
+    <p class="ch-subtitle">You now know all 4 advanced techniques. Let's put them together into the full email intelligence pipeline — the one you'll demo to Priya on Friday.</p>
+  </div>
+
+  <h2>Accuracy Progression — What Each Technique Added</h2>
+
+  <div class="accuracy-bar">
+    <div class="acc-label">Session 3: Zero-Shot + Structure + Few-Shot examples</div>
+    <div class="acc-track"><div class="acc-fill basic" style="width:80%">80% accuracy</div></div>
+  </div>
+  <div class="accuracy-bar">
+    <div class="acc-label">+ Zero-Shot CoT (step-by-step reasoning)</div>
+    <div class="acc-track"><div class="acc-fill few-shot" style="width:88%">88% accuracy</div></div>
+  </div>
+  <div class="accuracy-bar">
+    <div class="acc-label">+ Few-Shot CoT (domain-specific reasoning examples)</div>
+    <div class="acc-track"><div class="acc-fill cot" style="width:93%">93% accuracy</div></div>
+  </div>
+  <div class="accuracy-bar">
+    <div class="acc-label">+ Self-Consistency on ambiguous emails</div>
+    <div class="acc-track"><div class="acc-fill sc" style="width:96%">96% accuracy + confidence scores</div></div>
+  </div>
+
+  <h2>The Complete Pipeline</h2>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">complete_email_pipeline.py</span><span class="code-tag win-tag">PRODUCTION READY</span></div>
+    <div class="code-body"><pre><span class="cb">def</span> <span class="cg">process_email</span>(email: dict) -> dict:
+    <span class="cy">"""
+    Complete email intelligence pipeline.
+    Combines all techniques learned across Sessions 3 & 4.
+    
+    Returns:
+    - classification (category + urgency + confidence)
+    - routing decision  
+    - drafted response (for churn-risk emails)
+    - audit trail (reasoning traces for debugging)
+    """</span>
+    
+    <span class="ck">### STEP 1: Quick classification with CoT (1 API call) ###</span>
+    initial = classify_with_cot(
+        subject=email[<span class="cy">"subject"</span>],
+        body=email[<span class="cy">"body"</span>]
+    )
+    
+    <span class="ck">### STEP 2: Check if this is a high-stakes case ###</span>
+    is_high_stakes = (
+        initial[<span class="cy">"urgency"</span>] == <span class="cy">"High"</span>
+        <span class="cb">or</span> is_enterprise_customer(email[<span class="cy">"sender"</span>])
+        <span class="cb">or</span> <span class="gf">any</span>(w <span class="cb">in</span> email[<span class="cy">"body"</span>].lower()
+               <span class="cb">for</span> w <span class="cb">in</span> [<span class="cy">"cancel"</span>, <span class="cy">"competitor"</span>, <span class="cy">"lawsuit"</span>, <span class="cy">"refund"</span>])
+    )
+    
+    <span class="ck">### STEP 3: If high-stakes, run Self-Consistency for reliability ###</span>
+    <span class="cb">if</span> is_high_stakes:
+        final_classification = classify_with_self_consistency(
+            email, n_runs=<span class="cm">5</span>
+        )
+    <span class="cb">else</span>:
+        final_classification = initial  <span class="ck"># CoT is enough</span>
+    
+    <span class="ck">### STEP 4: Route the ticket ###</span>
+    routing = {
+        <span class="cy">"Billing"</span>: <span class="cy">"billing-team@company.com"</span>,
+        <span class="cy">"Technical"</span>: <span class="cy">"tech-support@company.com"</span>,
+        <span class="cy">"Feature Request"</span>: <span class="cy">"product@company.com"</span>,
+        <span class="cy">"Spam"</span>: None,  <span class="ck"># auto-delete</span>
+    }
+    routed_to = routing.get(final_classification[<span class="cy">"category"</span>], <span class="cy">"support@company.com"</span>)
+    
+    <span class="ck">### STEP 5: If churn-risk, draft response using Tree of Thought ###</span>
+    drafted_response = None
+    is_churn_risk = (
+        <span class="cy">"cancel"</span> <span class="cb">in</span> email[<span class="cy">"body"</span>].lower()
+        <span class="cb">or</span> <span class="cy">"competitor"</span> <span class="cb">in</span> email[<span class="cy">"body"</span>].lower()
+    )
+    
+    <span class="cb">if</span> is_churn_risk:
+        drafted_response = draft_response_with_tot(email, final_classification)
+    
+    <span class="ck">### RETURN everything ###</span>
+    <span class="cb">return</span> {
+        <span class="cy">"email_id"</span>: email[<span class="cy">"id"</span>],
+        <span class="cy">"classification"</span>: final_classification,
+        <span class="cy">"routed_to"</span>: routed_to,
+        <span class="cy">"drafted_response"</span>: drafted_response,
+        <span class="cy">"needs_human_review"</span>: final_classification.get(<span class="cy">"needs_human_review"</span>, False),
+        <span class="cy">"audit_trail"</span>: final_classification.get(<span class="cy">"reasoning_traces"</span>, [])
+    }</pre></div>
+  </div>
+
+  <div class="win-box">
+    <div class="win-label">What You've Built in 2 Sessions</div>
+    <p>Starting from 15 lines that produced 127-word essays, you now have a production email intelligence system that: classifies with 96% accuracy, provides confidence scores, explains its reasoning, handles domain-specific terminology, auto-drafts responses for churn-risk emails, routes tickets automatically, and generates audit trails for debugging.</p>
+    <p><strong>This is a real system that real companies pay engineering teams to build. You built it with prompt engineering.</strong></p>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-btn" onclick="goTo(5)"><small>←</small> Tree of Thought</button>
+    <button class="ch-btn primary" onclick="goTo(7)"><small>Next →</small> Why We Need LangChain</button>
+  </div>
+</div>
+
+<!-- ══════ CH 8: WHY LANGCHAIN ══════ -->
+<div class="chapter" id="ch7">
+  <div class="ch-hero">
+    <div class="ch-number">// Chapter 8 — The Bridge to Session 5</div>
+    <h1 class="ch-title">Your code is getting<br><span class="accent2">messy.</span><br>Here's why.</h1>
+    <p class="ch-subtitle">You've built something powerful. But look at your codebase after 2 sessions. It's 600+ lines of string formatting, regex parsing, API calls, and retry logic. What happens when requirements change?</p>
+  </div>
+
+  <div class="story-box">
+    <div class="story-label">Monday Morning Code Review</div>
+    <p>Your tech lead Arjun reviews your pipeline. He has questions:</p>
+    <p><em>"Where are the prompt templates version-controlled? How do I A/B test two different CoT prompts? If OpenAI changes their API, how many places do I update? How do I add memory so the AI remembers context across a long email thread? How do I add a web search tool to look up customer account details?"</em></p>
+    <p>You realize: every one of these requires significant rework in plain Python + OpenAI SDK. You've been solving the wrong problem — building infrastructure when you should be building features.</p>
+  </div>
+
+  <h2>The 6 Pain Points with Plain Python</h2>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">pain_points.py</span><span class="code-tag pain-tag">CURRENT STATE</span></div>
+    <div class="code-body"><pre><span class="ck">## Pain 1: Prompt strings are just... strings. Not versionable, not testable.</span>
+prompt = <span class="cy">f"You are a classifier. Classify: {email}"</span>
+<span class="ck"># If you change this, every test breaks. No rollback. No A/B testing.</span>
+
+<span class="ck">## Pain 2: You're writing JSON parsers for every prompt output.</span>
+json_match = re.search(<span class="cy">r'\{[^}]+\}'</span>, raw_output)  <span class="ck"># fragile regex</span>
+<span class="ck"># This breaks whenever the model adds markdown or commentary.</span>
+
+<span class="ck">## Pain 3: Retry logic is manual and scattered.</span>
+<span class="cb">for</span> attempt <span class="cb">in</span> <span class="gf">range</span>(<span class="cm">3</span>):
+    <span class="cb">try</span>:
+        response = client.chat.completions.create(...)
+    <span class="cb">except</span> RateLimitError:
+        time.sleep(<span class="cm">2</span> ** attempt)
+<span class="ck"># You've written this 4 times across 4 different functions.</span>
+
+<span class="ck">## Pain 4: Multi-step chains are just nested function calls.</span>
+step1 = classify(email)       <span class="ck"># API call 1</span>
+step2 = score(step1)          <span class="ck"># API call 2</span>
+step3 = draft(step2)          <span class="ck"># API call 3</span>
+<span class="ck"># No observability. No easy way to debug which step failed.</span>
+
+<span class="ck">## Pain 5: Memory is manual state management.</span>
+history = []
+history.append({<span class="cy">"role"</span>: <span class="cy">"user"</span>, <span class="cy">"content"</span>: email})
+<span class="ck"># For a 10-email thread? You're manually tracking all history.</span>
+
+<span class="ck">## Pain 6: Adding tools (database lookup, API calls) means more spaghetti.</span>
+customer_info = db.query(<span class="cy">f"SELECT * FROM customers WHERE email='{sender}'"</span>)
+<span class="ck"># The prompt doesn't know about this. You manually format it in.
+# Adding a new tool = rewrite the whole function.</span></pre></div>
+  </div>
+
+  <h2>What LangChain Actually Solves</h2>
+
+  <table>
+    <thead><tr><th>Your Pain</th><th>LangChain Solution</th></tr></thead>
+    <tbody>
+      <tr><td>Prompt strings aren't versioned</td><td><code>PromptTemplate</code> — variables are explicit, composable, testable</td></tr>
+      <tr><td>JSON parsing is brittle regex</td><td><code>PydanticOutputParser</code> — structured output with schema validation</td></tr>
+      <tr><td>Retry logic scattered everywhere</td><td>Built-in retry and fallback mechanisms</td></tr>
+      <tr><td>Multi-step chains are invisible</td><td><code>LCEL</code> chains — each step is explicit, observable, debuggable</td></tr>
+      <tr><td>Memory is manual state management</td><td><code>ConversationBufferMemory</code>, <code>VectorStore</code> memory</td></tr>
+      <tr><td>Tools need custom integration</td><td><code>Tools</code> + <code>Agents</code> — plug in any tool declaratively</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">langchain_preview.py</span><span class="code-tag win-tag">SESSION 5 PREVIEW</span></div>
+    <div class="code-body"><pre><span class="ck"># What your email classifier looks like in LangChain (preview)</span>
+<span class="ck"># You'll build this completely in Session 5</span>
+
+<span class="cb">from</span> langchain.prompts <span class="cb">import</span> ChatPromptTemplate
+<span class="cb">from</span> langchain_openai <span class="cb">import</span> ChatOpenAI
+<span class="cb">from</span> langchain_core.output_parsers <span class="cb">import</span> PydanticOutputParser
+<span class="cb">from</span> pydantic <span class="cb">import</span> BaseModel, Field
+
+<span class="ck"># 1. Define output structure — no more regex!</span>
+<span class="cb">class</span> <span class="cm">EmailClassification</span>(BaseModel):
+    category: str = Field(description=<span class="cy">"One of: Billing, Technical, Feature Request, Spam, Other"</span>)
+    urgency: str = Field(description=<span class="cy">"One of: High, Medium, Low"</span>)
+    reasoning: str = Field(description=<span class="cy">"Step-by-step reasoning for this classification"</span>)
+
+<span class="ck"># 2. Define prompt template — variables are explicit, reusable</span>
+classifier_prompt = ChatPromptTemplate.from_template(<span class="cy">"""
+You are an expert support email classifier.
+
+{format_instructions}
+
+Think step by step. Classify this email:
+Subject: {subject}
+Body: {body}
+"""</span>)
+
+<span class="ck"># 3. Build the chain — composable, observable</span>
+parser = PydanticOutputParser(pydantic_object=EmailClassification)
+model = ChatOpenAI(model=<span class="cy">"gpt-4o-mini"</span>, temperature=<span class="cm">0</span>)
+
+chain = classifier_prompt | model | parser  <span class="ck"># LCEL syntax</span>
+
+<span class="ck"># 4. Run it — clean, simple, validated</span>
+result = chain.invoke({
+    <span class="cy">"subject"</span>: <span class="cy">"Can't login after payment"</span>,
+    <span class="cy">"body"</span>: <span class="cy">"Paid for annual plan last week, now can't login."</span>,
+    <span class="cy">"format_instructions"</span>: parser.get_format_instructions()
+})
+<span class="ck"># result is a validated EmailClassification object — not raw text
+# result.category = "Billing"  ← type-safe, guaranteed
+# result.reasoning = "..."     ← the CoT thinking
+# result.urgency = "High"      ← validated against allowed values</span></pre></div>
+  </div>
+
+  <div class="next-teaser">
+    <div class="nt-label">// Coming Up — Session 5</div>
+    <h3>Same classifier. 80% less code. 10x more maintainable.</h3>
+    <p>In Session 5, we rebuild everything you've built in Sessions 3 & 4 using LangChain. PromptTemplates, LCEL chains, output parsers, memory, and tools. By the end, adding a new product to your classifier is a 2-line config change — not a 2-hour refactor.</p>
+    <div class="cliffhanger">Session 5: LangChain from scratch. You'll finally understand why it exists — because you've felt every pain it solves. →</div>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-btn" onclick="goTo(6)"><small>←</small> Full System</button>
+    <button class="ch-btn primary" onclick="goTo(8)"><small>Next →</small> Final Quiz</button>
+  </div>
+</div>
+
+<!-- ══════ CH 9: QUIZ ══════ -->
+<div class="chapter" id="ch8">
+  <div class="ch-hero">
+    <div class="ch-number">// Final Quiz — Session 4</div>
+    <h1 class="ch-title">Advanced<br><span class="accent">Techniques</span><br>Check</h1>
+    <p class="ch-subtitle">These questions are based on real engineering decisions from the classifier we built together.</p>
+  </div>
+
+  <div class="quiz-section">
+    <h3>🧠 Session 4 Knowledge Check</h3>
+
+    <div class="quiz-q">Q1. Your classifier correctly identifies "can't login" as Billing after CoT reasoning, but without CoT it says Technical. What does this prove about LLMs?</div>
+    <div class="q-options">
+      <button class="q-opt" onclick="ans(this,false,'LLMs arent dumb — the model has the knowledge needed to correctly classify this. The issue is the reasoning path, not knowledge.')">A. LLMs are too dumb for complex classification</button>
+      <button class="q-opt" onclick="ans(this,true,'Correct! LLMs are powerful pattern predictors, not reasoners by default. When you prompt them to reason step-by-step (CoT), they access relevant knowledge in a structured way instead of just matching the most frequent surface pattern (login = Technical). The knowledge was always there — CoT unlocks it.')">B. LLMs have the knowledge but default to surface-pattern matching without reasoning prompts</button>
+      <button class="q-opt" onclick="ans(this,false,'Temperature affects randomness/creativity, not whether the model uses surface vs deep reasoning.')">C. You need lower temperature for complex reasoning</button>
+      <button class="q-opt" onclick="ans(this,false,'GPT-4 would probably do better, but CoT works on gpt-4o-mini too. The technique matters more than the model here.')">D. You need GPT-4 for this, not gpt-4o-mini</button>
+    </div>
+    <div class="q-feedback"></div>
+
+    <div class="quiz-q">Q2. For a high-stakes churn-risk email you run Self-Consistency with 5 runs and get: Billing×3, Technical×2. Confidence = 60%. What should your system do?</div>
+    <div class="q-options">
+      <button class="q-opt" onclick="ans(this,false,'60% is a thin majority — for a high-stakes churn-risk email, automatically routing to Billing without review is risky. What if the 2 Technical votes are right?')">A. Route to Billing automatically — it won the majority</button>
+      <button class="q-opt" onclick="ans(this,false,'Running 10 times costs more and may still land at 60%. The real answer is to handle low-confidence gracefully, not just brute-force more runs.')">B. Run 10 more times until confidence reaches 100%</button>
+      <button class="q-opt" onclick="ans(this,true,'Correct! 60% confidence is below your threshold (you set 70%+ as auto-route). For a churn-risk email this is the right call: flag it, route to a senior agent with the full reasoning traces so they can decide. Your needs_human_review: true flag should trigger this flow automatically.')">C. Flag for human review — 60% confidence is below threshold for high-stakes emails, send the reasoning traces to a senior agent</button>
+      <button class="q-opt" onclick="ans(this,false,'Discarding is never the answer for a churn-risk email. You need to handle it, just carefully.')">D. Discard the email and ask the customer to resend</button>
+    </div>
+    <div class="q-feedback"></div>
+
+    <div class="quiz-q">Q3. When should you use Tree of Thought instead of Self-Consistency for an email task?</div>
+    <div class="q-options">
+      <button class="q-opt" onclick="ans(this,false,'Self-Consistency is actually better than ToT for finding the right classification — SC finds the most consistent answer, ToT explores different solution paths.')">A. When you need the most accurate classification between Billing and Technical</button>
+      <button class="q-opt" onclick="ans(this,true,'Correct! ToT shines when there are multiple valid approaches and you need to compare them to find the best one. Drafting a customer response has many valid strategies (empathetic, direct, escalate, offer discount) — ToT explores and scores them all. Classification has one right answer, so SC is better there.')">B. When drafting a customer response — multiple strategies exist and you need to evaluate which is best</button>
+      <button class="q-opt" onclick="ans(this,false,'Self-Consistency runs the same prompt multiple times for stability. ToT explores different approaches — it wont make SC results more stable.')">C. When Self-Consistency gives inconsistent results</button>
+      <button class="q-opt" onclick="ans(this,false,'ToT explores different reasoning paths — its appropriate even for shorter prompts when the task is open-ended or has multiple valid solutions.')">D. Only for prompts longer than 500 tokens</button>
+    </div>
+    <div class="q-feedback"></div>
+
+    <div class="quiz-q">Q4. Your fintech client's emails use "NACH mandate" and "chargeback T+2". Zero-Shot CoT fails on these. Few-Shot CoT works. What exactly did the examples add?</div>
+    <div class="q-options">
+      <button class="q-opt" onclick="ans(this,false,'The model already knows general reasoning patterns — ZS-CoT proves this. The problem is domain-specific terminology, not general reasoning ability.')">A. General reasoning ability the model lacked</button>
+      <button class="q-opt" onclick="ans(this,false,'The model definitely knows these terms exist — they appear in its training data. The issue is how to interpret them in YOUR specific classification context.')">B. Knowledge that NACH and chargeback exist</button>
+      <button class="q-opt" onclick="ans(this,true,'Correct! The examples showed the model: (1) how YOUR company interprets these domain-specific terms, (2) what category they map to in your classification schema, (3) the reasoning pattern to use (surface complaint → root cause → team). The model had general knowledge but needed your business-specific interpretation encoded as examples.')">C. Domain-specific interpretation — how YOUR company classifies these terms, which the model cant know from general training</button>
+      <button class="q-opt" onclick="ans(this,false,'Temperature affects creativity, not domain knowledge. This is a knowledge/context problem.')">D. A lower temperature setting for the examples</button>
+    </div>
+    <div class="q-feedback"></div>
+
+    <div class="quiz-q">Q5. After Sessions 3 & 4, your plain Python classifier is 600+ lines. What's the most important reason to move to LangChain in Session 5?</div>
+    <div class="q-options">
+      <button class="q-opt" onclick="ans(this,false,'LangChain doesnt inherently make the AI smarter — its about code maintainability, not accuracy.')">A. LangChain makes the AI model smarter</button>
+      <button class="q-opt" onclick="ans(this,false,'LangChain uses the same OpenAI API under the hood. Speed is about the same.')">B. LangChain is faster than the OpenAI SDK</button>
+      <button class="q-opt" onclick="ans(this,true,'Correct! This is exactly the right reason. You\'ve felt every pain that LangChain solves: brittle regex parsing → PydanticOutputParser. Scattered retry logic → built-in. Invisible chains → LCEL + LangSmith observability. Manual memory → ConversationMemory. Adding tools → declarative Tool integration. LangChain is the engineering framework for what you built by hand.')">C. Your current code has all the prompting logic right but needs better engineering infrastructure — versioned prompts, validated outputs, observable chains, built-in memory</button>
+      <button class="q-opt" onclick="ans(this,false,'LangChain is open source. Cost is the same — same API, same tokens.')">D. LangChain reduces API costs</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="next-teaser">
+    <div class="nt-label">// Sessions 3 & 4 — Complete</div>
+    <h3>You've Built a Real Production System From Scratch.</h3>
+    <p>15 lines → 600 lines of production-grade AI. You understand every decision: why CoT, when Self-Consistency, where ToT. More importantly, you understand the pain of doing this in raw Python — which means you'll actually appreciate what LangChain solves.</p>
+    <div class="cliffhanger">Session 5: We rebuild all of this in LangChain. Cleaner. Faster. Production-ready. The payoff for everything you've learned. →</div>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-btn" onclick="goTo(7)"><small>←</small> Why LangChain</button>
+    <div></div>
+  </div>
+</div>
+
+</main>
+
+<script>
+const chapters = document.querySelectorAll('.chapter');
+const navBtns = document.querySelectorAll('.nav-ch');
+let current = 0;
+
+function goTo(idx) {
+  chapters[current].classList.remove('active');
+  navBtns[current].classList.remove('active');
+  current = idx;
+  chapters[current].classList.add('active');
+  navBtns[current].classList.add('active');
+  window.scrollTo(0, 0);
+  document.getElementById('ch-counter').textContent = `${current+1} / ${chapters.length}`;
+  document.getElementById('pf').style.width = `${((current+1)/chapters.length)*100}%`;
+}
+
+function ans(btn, correct, explanation) {
+  const parent = btn.parentElement;
+  const feedbackEl = parent.nextElementSibling;
+  parent.querySelectorAll('.q-opt').forEach(b => { b.style.pointerEvents='none'; b.style.opacity='0.55'; });
+  btn.style.opacity='1';
+  btn.classList.add(correct ? 'correct' : 'wrong');
+  feedbackEl.textContent = explanation;
+  feedbackEl.className = 'q-feedback show ' + (correct ? 'ok' : 'no');
+}
+</script>
+</body>
+</html>
