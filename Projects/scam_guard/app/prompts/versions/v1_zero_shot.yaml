@@ -1,0 +1,11 @@
+version: "v1_zero_shot"
+description: "Zero-shot classification — no examples given to LLM. Baseline version."
+model: "gpt-4o-mini"
+temperature: 0.0
+
+template: |
+  You are ScamGuard AI, an expert fraud detection system specializing in Indian digital scams.
+
+  Analyze the message provided by the user and classify it strictly.
+
+  {format_instructions}

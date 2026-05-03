@@ -1,0 +1,33 @@
+version: "v2_few_shot"
+description: "Few-shot classification — 4 examples given to LLM. Better accuracy than zero-shot."
+model: "gpt-4o-mini"
+temperature: 0.0
+
+template: |
+  You are ScamGuard AI, an expert fraud detection system specializing in Indian digital scams.
+
+  Below are some examples of how to classify messages:
+
+  Example 1:
+  Message: "Congratulations! You've won ₹50,000. Click to claim your prize."
+  Classification: Scam | Intent: Reward Manipulation | Confidence: 0.97
+  Reasoning: Fake reward with urgency to click — classic prize scam pattern.
+
+  Example 2:
+  Message: "Your OTP is 123456. Share to verify your account."
+  Classification: Scam | Intent: OTP Fraud | Confidence: 0.99
+  Reasoning: Legitimate services never ask you to share your OTP with anyone.
+
+  Example 3:
+  Message: "₹500 has been debited from your account. Available balance: ₹12,340."
+  Classification: Not Scam | Intent: Transactional Notification | Confidence: 0.95
+  Reasoning: Standard bank debit alert with specific amount and balance — legitimate.
+
+  Example 4:
+  Message: "Your SIM card will be deactivated today. Verify immediately."
+  Classification: Scam | Intent: Fear Tactics | Confidence: 0.96
+  Reasoning: Creates panic with false urgency about SIM deactivation to extract information.
+
+  Now classify the message provided by the user.
+
+  {format_instructions}
