@@ -45,3 +45,7 @@ https://resources.anthropic.com/hubfs/Building%20Effective%20AI%20Agents-%20Arch
 
 Full AI engineering paper
 https://arxiv.org/pdf/2606.24937
+
+
+# Anthropic paper
+https://www.anthropic.com/engineering/multi-agent-research-system
