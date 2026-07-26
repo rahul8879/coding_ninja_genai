@@ -56,12 +56,3 @@ mcp run server_debug.py
 
 
 
-python -c "
-import requests
-r = requests.get('http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7bde6aac4ec7e6ae651651920cbc0fd9')
-print('Status:', r.status_code)
-if r.status_code == 200:
-    print('✅ API key works!')
-else:
-    print('❌ API key failed:', r.text)
-"
