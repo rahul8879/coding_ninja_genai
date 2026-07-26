@@ -1,0 +1,25 @@
+
+Request --
+{
+  "jsonrpc": "2.0",
+  "method": "get_weather",
+  "params": {"location": "London,uk"},
+  "id": 1
+}
+
+# lets say my server is running at https://test.mcp.server
+
+{
+  "jsonrpc": "2.0",
+  "method": "get_weather",
+  "params": {"location": "London,uk"},
+  "id": 1
+}
+
+
+Server --> response
+{
+  "jsonrpc": "2.0",
+  "result": {"temperature_celsius": "15°C"},
+  "id": 1
+}
