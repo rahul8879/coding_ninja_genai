@@ -1,6 +1,5 @@
 from typing import TypedDict, Literal, Optional
 
-
 class SchedulingState(TypedDict):
     job_id: str
     candidate: dict
