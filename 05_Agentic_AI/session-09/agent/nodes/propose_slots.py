@@ -9,12 +9,12 @@ def _format_slots_for_email(slots: list[str]) -> str:
 async def propose_slots_via_email(state: SchedulingState):
     client = get_client()
     candidate = state["candidate"]
-    slots = state["panel_provided_slots"]
+    slots = state["proposed_slots"]
 
     subject = "Interview Scheduling — Backend Engineer"
 
     body = (
-        f"Dear {candidate['name']},\n\n"
+        f"Dear Rahul,\n\n"
         f"Thank you for your interest in the Backend Engineer role with us. "
         f"We were impressed with your background and would like to invite you "
         f"for an interview.\n\n"
