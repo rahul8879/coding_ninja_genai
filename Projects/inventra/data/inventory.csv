@@ -1,0 +1,101 @@
+sku,name,category,region,qty,reorder_threshold,unit_cost,vendor_id
+SKU001,Mixer Grinder,Kitchen Appliances,North,41,16,3500,V001
+SKU002,Pressure Cooker,Kitchen Appliances,North,55,30,2500,V018
+SKU003,Electric Kettle,Kitchen Appliances,West,65,10,800,V019
+SKU004,Induction Cooktop,Kitchen Appliances,East,57,20,3000,V005
+SKU005,Rice Cooker,Kitchen Appliances,North,74,29,2500,V012
+SKU006,Toaster,Kitchen Appliances,West,45,22,2000,V018
+SKU007,Sandwich Maker,Kitchen Appliances,Central,54,12,1200,V012
+SKU008,Food Processor,Kitchen Appliances,North,42,22,4500,V008
+SKU009,Wet Grinder,Kitchen Appliances,East,26,10,7000,V006
+SKU010,Electric Chopper,Kitchen Appliances,North,51,27,2400,V020
+SKU011,Coffee Maker,Kitchen Appliances,West,58,20,3500,V009
+SKU012,Microwave Oven,Kitchen Appliances,East,64,12,5000,V013
+SKU013,OTG,Kitchen Appliances,East,35,12,7000,V007
+SKU014,Juicer Mixer Grinder,Kitchen Appliances,East,61,27,2800,V005
+SKU015,Electric Roti Maker,Kitchen Appliances,Central,81,21,2500,V014
+SKU016,Dosa Maker,Kitchen Appliances,West,36,13,2400,V003
+SKU017,Idli Maker,Kitchen Appliances,West,38,22,1600,V020
+SKU018,Air Fryer,Kitchen Appliances,Central,100,10,5000,V009
+SKU019,Hand Blender,Kitchen Appliances,Central,73,13,3000,V009
+SKU020,Electric Griller,Kitchen Appliances,West,63,26,2500,V001
+SKU021,Ceiling Fan,Home Appliances,East,55,14,1500,V017
+SKU022,Table Fan,Home Appliances,Central,71,25,1800,V001
+SKU023,Pedestal Fan,Home Appliances,East,37,17,1800,V008
+SKU024,Exhaust Fan,Home Appliances,West,98,14,600,V003
+SKU025,Air Cooler,Home Appliances,South,31,14,8500,V009
+SKU026,Air Conditioner,Home Appliances,South,17,8,45000,V010
+SKU027,Room Heater,Home Appliances,West,61,17,3500,V004
+SKU028,Water Heater Geyser,Home Appliances,Central,59,28,4000,V018
+SKU029,Instant Water Heater,Home Appliances,North,38,11,2500,V008
+SKU030,Washing Machine,Home Appliances,South,20,4,25000,V009
+SKU031,Semi-Automatic Washing Machine,Home Appliances,West,40,12,12000,V008
+SKU032,Refrigerator,Home Appliances,North,26,11,15000,V014
+SKU033,Deep Freezer,Home Appliances,North,6,6,20000,V004
+SKU034,Vacuum Cleaner,Home Appliances,South,98,24,3500,V007
+SKU035,Iron Box,Home Appliances,East,61,12,600,V015
+SKU036,Steam Iron,Home Appliances,North,31,12,1200,V018
+SKU037,Sewing Machine,Home Appliances,West,21,11,8000,V016
+SKU038,Air Purifier,Home Appliances,North,23,12,10000,V013
+SKU039,Humidifier,Home Appliances,Central,49,16,5000,V016
+SKU040,Dehumidifier,Home Appliances,Central,16,10,8000,V018
+SKU041,LED TV 32 inch,Electronics,West,10,3,20000,V017
+SKU042,LED TV 43 inch,Electronics,Central,12,6,20000,V003
+SKU043,Smart TV 55 inch,Electronics,Central,6,7,35000,V020
+SKU044,Home Theater System,Electronics,Central,15,5,18000,V019
+SKU045,Soundbar,Electronics,East,46,30,5000,V013
+SKU046,DVD Player,Electronics,North,88,29,3000,V001
+SKU047,Set Top Box,Electronics,Central,94,18,1500,V007
+SKU048,WiFi Router,Electronics,South,66,15,800,V012
+SKU049,Inverter,Electronics,East,40,15,12000,V020
+SKU050,UPS,Electronics,Central,36,6,8000,V010
+SKU051,Stabilizer,Electronics,North,49,18,1500,V018
+SKU052,Extension Board,Electronics,East,63,26,300,V007
+SKU053,Power Strip,Electronics,North,65,11,400,V014
+SKU054,Voltage Guard,Electronics,East,86,27,800,V006
+SKU055,Electric Chimney,Electronics,North,49,27,5000,V003
+SKU056,Hair Dryer,Personal Care,Central,85,14,2500,V005
+SKU057,Hair Straightener,Personal Care,North,56,17,1800,V012
+SKU058,Hair Trimmer,Personal Care,Central,49,17,1500,V014
+SKU059,Electric Shaver,Personal Care,North,72,23,2500,V006
+SKU060,Epilator,Personal Care,South,78,11,3000,V004
+SKU061,Massager,Personal Care,West,69,17,1500,V012
+SKU062,Weighing Scale,Personal Care,South,72,18,1800,V013
+SKU063,BP Monitor,Personal Care,Central,98,20,2000,V013
+SKU064,Thermometer Digital,Personal Care,South,63,11,500,V019
+SKU065,LED Bulb 9W,Lighting,East,85,29,250,V011
+SKU066,LED Bulb 12W,Lighting,Central,62,11,350,V007
+SKU067,LED Tube Light,Lighting,Central,76,23,800,V007
+SKU068,Emergency Light,Lighting,East,68,26,1200,V004
+SKU069,Rechargeable Torch,Lighting,West,100,14,700,V010
+SKU070,Night Lamp,Lighting,West,68,22,600,V006
+SKU071,Table Lamp,Lighting,East,85,28,1000,V007
+SKU072,Study Lamp,Lighting,West,57,26,1500,V015
+SKU073,Decorative Light,Lighting,North,95,30,2000,V010
+SKU074,String Lights,Lighting,South,58,16,400,V010
+SKU075,Water Purifier RO,Water Solutions,South,34,6,8000,V016
+SKU076,Water Purifier UV,Water Solutions,Central,37,11,12000,V007
+SKU077,Water Filter,Water Solutions,South,43,23,2000,V001
+SKU078,Water Dispenser,Water Solutions,Central,16,13,8000,V015
+SKU079,Electric Pump,Water Solutions,South,36,13,5500,V015
+SKU080,Electric Mosquito Killer,Home Care,West,94,23,900,V020
+SKU081,Mosquito Racket,Home Care,West,63,17,200,V015
+SKU082,Insect Killer Lamp,Home Care,West,65,24,2500,V008
+SKU083,Room Freshener Electric,Home Care,East,70,27,600,V011
+SKU084,Dishwasher,Kitchen Appliances,South,9,8,20000,V013
+SKU085,Chimney Hood,Kitchen Appliances,West,32,12,10000,V011
+SKU086,LED TV 32 inch Pro,Electronics,West,39,14,12000,V013
+SKU087,Food Processor Pro,Kitchen Appliances,West,15,10,6000,V016
+SKU088,Pressure Cooker Pro,Kitchen Appliances,Central,58,25,2000,V018
+SKU089,WiFi Router Pro,Electronics,West,79,20,1500,V001
+SKU090,Air Fryer Pro,Kitchen Appliances,South,19,14,7000,V015
+SKU091,Dosa Maker Pro,Kitchen Appliances,Central,33,12,1800,V019
+SKU092,Electric Roti Maker Pro,Kitchen Appliances,West,36,18,1500,V006
+SKU093,Wet Grinder Pro,Kitchen Appliances,West,73,22,4000,V011
+SKU094,WiFi Router Pro,Electronics,North,32,27,1500,V016
+SKU095,Sandwich Maker Pro,Kitchen Appliances,North,33,17,800,V002
+SKU096,Home Theater System Pro,Electronics,South,9,6,18000,V008
+SKU097,WiFi Router Pro,Electronics,West,77,15,800,V009
+SKU098,Iron Box Pro,Home Appliances,North,69,13,1500,V006
+SKU099,Toaster Pro,Kitchen Appliances,Central,80,16,1500,V013
+SKU100,Air Purifier Pro,Home Appliances,South,37,9,15000,V004
