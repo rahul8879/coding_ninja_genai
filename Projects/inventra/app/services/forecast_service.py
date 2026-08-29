@@ -17,6 +17,7 @@ import joblib
 import pandas as pd
 import xgboost as xgb
 from db.session import SessionLocal
+from db.models import Inventory
 
 MODEL_DIR = Path("models")
 
@@ -66,3 +67,128 @@ class ForecastService:
                 one_hot_encoder.categories_,
             )
         }
+
+    def _validate_category(
+        self,
+        feature: str,
+        value: str,
+    ) -> Optional[str]:
+        valid_values = self.valid_categories.get(feature, set())
+
+        if value not in valid_values:
+            return (
+                f"Unknown {feature} '{value}'. "
+                f"Model was trained on: {sorted(valid_values)}"
+            )
+
+        return None
+
+    def predict(
+        self,
+        sku: str,
+        region: str,
+        weather_condition: str,
+        temperature: float,
+        rainfall: float,
+        humidity: float,
+        month: int,
+        day_of_week: int,
+        is_weekend: int,
+    ) -> dict:
+        """
+        Predict demand for a SKU.
+
+        SKU is NOT used directly as an ML feature.
+        It is used as a business identifier to retrieve the
+        product category from the inventory database.
+        """
+
+        if not 1 <= month <= 12:
+            return {"error": "month must be between 1 and 12."}
+
+        if not 0 <= day_of_week <= 6:
+            return {"error": "day_of_week must be between 0 and 6."}
+
+        if is_weekend not in (0, 1):
+            return {"error": "is_weekend must be either 0 or 1."}
+
+        db = SessionLocal()
+
+        try:
+            item = (
+                db.query(Inventory)
+                .filter(Inventory.sku == sku)
+                .first()
+            )
+
+            if item is None:
+                return {"error": f"Unknown SKU '{sku}'."}
+
+            product_name = item.name
+            category = item.category
+
+        finally:
+            db.close()
+
+        for feature, value in [
+            ("category", category),
+            ("region", region),
+            ("weather_condition", weather_condition),
+        ]:
+            error = self._validate_category(feature, value)
+
+            if error:
+                return {"error": error}
+
+        model_input = pd.DataFrame(
+            [
+                {
+                    "category": category,
+                    "region": region,
+                    "weather_condition": weather_condition,
+                    "temperature": float(temperature),
+                    "rainfall": float(rainfall),
+                    "humidity": float(humidity),
+                    "month": int(month),
+                    "day_of_week": int(day_of_week),
+                    "is_weekend": int(is_weekend),
+                }
+            ]
+        )
+
+        encoded_input = self.preprocessor.transform(model_input)
+
+        prediction = self.model.predict(encoded_input)[0]
+
+        predicted_qty = max(0.0, float(prediction))
+
+        return {
+            "sku": sku,
+            "product_name": product_name,
+            "category": category,
+            "region": region,
+            "weather_condition": weather_condition,
+            "temperature": float(temperature),
+            "rainfall": float(rainfall),
+            "humidity": float(humidity),
+            "month": int(month),
+            "day_of_week": int(day_of_week),
+            "is_weekend": int(is_weekend),
+            "predicted_qty": round(predicted_qty, 2),
+            "model": "XGBoost",
+        }
+
+
+_forecast_service_instance: Optional[ForecastService] = None
+
+
+def get_forecast_service() -> ForecastService:
+    """Return one shared ForecastService instance."""
+
+    global _forecast_service_instance
+
+    if _forecast_service_instance is None:
+        _forecast_service_instance = ForecastService()
+
+    return _forecast_service_instance
+
