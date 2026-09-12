@@ -21,4 +21,4 @@ class ChatResponse(BaseModel):
     latency_ms: float
     sources: list[Source]
     request_id: str
-    # mode: Literal["rag", "retrieval_only"]
+    mode: Literal["rag", "retrieval_only"]

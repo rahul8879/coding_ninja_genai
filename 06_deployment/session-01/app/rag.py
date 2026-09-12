@@ -8,8 +8,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv()
 
-from config import Settings
-from prompts import get_prompt
+from app.config import Settings
+from app.prompts import get_prompt
 
 def load_policy_documents(data_dir: Path = Path("data/policies")) -> list[Document]:
     documents: list[Document] = []

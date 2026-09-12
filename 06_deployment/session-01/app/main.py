@@ -4,9 +4,9 @@ from uuid import uuid4
 from time import perf_counter
 
 from contextlib import asynccontextmanager
-from config import get_settings
-from rag import PolicyRAG
-from schemas import ChatRequest, ChatResponse, Source
+from app.config import get_settings
+from app.rag import PolicyRAG
+from app.schemas import ChatRequest, ChatResponse, Source
 from fastapi import FastAPI, HTTPException, Request
 
 
@@ -45,9 +45,11 @@ def chat(payload: ChatRequest, request: Request) -> ChatResponse:
     try:
         if payload.generate_answer:
             answer, documents = request.app.state.rag.answer(payload.question, prompt_version)
+            mode = "rag"
         else:
             documents = request.app.state.rag.retrieve(payload.question)
             answer = "Retrieval completed; LLM generation was disabled for this load-test request."
+            mode = "retrieval_only"
     except Exception as exc:
         # Avoid leaking API keys, prompts, or provider details to clients.
         raise HTTPException(status_code=502, detail=f"AI pipeline failed; request_id={request_id}") from exc
@@ -65,4 +67,3 @@ def chat(payload: ChatRequest, request: Request) -> ChatResponse:
         request_id=request_id,
         mode=mode,
     )
-
