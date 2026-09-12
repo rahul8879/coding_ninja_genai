@@ -1,7 +1,7 @@
 import os
 from functools import lru_cache
 from pathlib import Path
-from dotnev import load_dotenv
+from dotenv import load_dotenv
 load_dotenv()
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -15,3 +15,11 @@ class Settings(BaseSettings):
     prompt_version: str = "v2"
     max_context_chars: int = 6000
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+    # def model_post_init(self):
+    #     os.environ["LANGSMITH_TRACING"] = str(self.langsmith_tracing).lower()
+
+
+@lru_cache()
+def get_settings() -> Settings:
+    return Settings()
