@@ -9,7 +9,6 @@ from app.rag import PolicyRAG
 from app.schemas import ChatRequest, ChatResponse, Source
 from fastapi import FastAPI, HTTPException, Request
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup builds/loads embeddings once instead of on every request.
@@ -20,7 +19,11 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="My FastAPI App", 
               description="This is a sample FastAPI application.",
-                version="1.0.0")
+                version="1.0.0",
+                lifespan=lifespan,)
+
+
+
 
 app.add_middleware(
     CORSMiddleware,

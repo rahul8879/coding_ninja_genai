@@ -1,10 +1,7 @@
 
 import os
-
 from locust import HttpUser, between, task
-
-
-REAL_LLM = os.getenv("LOCUST_REAL_LLM", "false").lower() == "true"
+REAL_LLM = os.getenv("LOCUST_REAL_LLM", "true").lower() == "true"
 
 
 class PolicyAssistantUser(HttpUser):
