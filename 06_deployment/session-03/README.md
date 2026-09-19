@@ -14,3 +14,9 @@ Use for `StreamingResponse`, generators/iterators, and response behavior.
 https://fastapi.tiangolo.com/advanced/stream-data/
 
 Use for modern streaming guidance, including strings such as LLM output.
+
+
+# Event loop : Thread 
+https://pages.cs.wisc.edu/~remzi/OSTEP/threads-events.pdf
+
+https://docs.python.org/3/library/threading.html
