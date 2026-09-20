@@ -1,0 +1,331 @@
+name: FastAPI Docker CI-CD
+
+on:
+  # CI runs for Pull Requests targeting main
+  pull_request:
+    branches:
+      - main
+
+  # CI + CD runs when main is updated
+  push:
+    branches:
+      - main
+
+  # Allows manual execution from GitHub Actions
+  workflow_dispatch:
+
+
+jobs:
+
+  # =====================================================
+  # CI - TEST APPLICATION AND DOCKER CONTAINER
+  # =====================================================
+  ci:
+    name: CI - Test and Validate Docker
+    runs-on: ubuntu-latest
+
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+
+    steps:
+
+      # -------------------------------------------------
+      # 1. Checkout source code
+      # -------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      # -------------------------------------------------
+      # 2. Setup Python
+      # -------------------------------------------------
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+
+      # -------------------------------------------------
+      # 3. Install Python dependencies
+      # -------------------------------------------------
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest httpx
+
+
+      # -------------------------------------------------
+      # 4. Run unit tests
+      # -------------------------------------------------
+      - name: Run tests
+        run: |
+          pytest -q
+
+
+      # -------------------------------------------------
+      # 5. Build Docker image
+      # -------------------------------------------------
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t rahul-chatbot:${{ github.sha }} \
+            .
+
+
+      # -------------------------------------------------
+      # 6. Run Docker container
+      # -------------------------------------------------
+      - name: Run Docker container
+        run: |
+          docker run -d \
+            --name rahul-chatbot \
+            -p 7860:7860 \
+            rahul-chatbot:${{ github.sha }}
+
+
+      # -------------------------------------------------
+      # 7. Verify application health
+      # -------------------------------------------------
+      - name: Health check
+        run: |
+          echo "Waiting for application to start..."
+
+          for i in {1..10}; do
+
+            if curl --fail http://localhost:7860/health; then
+              echo ""
+              echo "Application is healthy"
+              exit 0
+            fi
+
+            echo "Application not ready yet..."
+            sleep 3
+
+          done
+
+          echo "Health check failed"
+
+          docker logs rahul-chatbot
+
+          exit 1
+
+
+      # -------------------------------------------------
+      # 8. Cleanup
+      # -------------------------------------------------
+      - name: Cleanup container
+        if: always()
+        run: |
+          docker rm -f rahul-chatbot || true
+
+
+
+  # =====================================================
+  # CD - DEPLOY TO GCP CLOUD RUN
+  # =====================================================
+  cd:
+    name: CD - Deploy to GCP Cloud Run
+
+    # CD starts only after CI succeeds
+    needs: ci
+
+    # Deployment only from main
+    # Supports push/merge and manual execution from main
+    if: >
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' ||
+       github.event_name == 'workflow_dispatch')
+
+    runs-on: ubuntu-latest
+
+
+    # Required for GitHub OIDC / Workload Identity Federation
+    permissions:
+      contents: read
+      id-token: write
+
+
+    # ---------------------------------------------------
+    # Deployment Configuration
+    # ---------------------------------------------------
+    env:
+      PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+
+      REGION: asia-south1
+
+      ARTIFACT_REPO: llmops-docker
+
+      SERVICE: rahul-chatbot
+
+      APP_PORT: "7860"
+
+
+    steps:
+
+      # -------------------------------------------------
+      # 1. Checkout source code
+      # -------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      # -------------------------------------------------
+      # 2. Validate required GitHub secrets
+      # -------------------------------------------------
+      - name: Validate GCP configuration
+        env:
+          WIF_PROVIDER: ${{ secrets.GCP_WIF_PROVIDER }}
+          DEPLOY_SA: ${{ secrets.GCP_DEPLOY_SA }}
+        run: |
+          if [ -z "$PROJECT_ID" ]; then
+            echo "ERROR: GCP_PROJECT_ID is missing"
+            exit 1
+          fi
+
+          if [ -z "$WIF_PROVIDER" ]; then
+            echo "ERROR: GCP_WIF_PROVIDER is missing"
+            exit 1
+          fi
+
+          if [ -z "$DEPLOY_SA" ]; then
+            echo "ERROR: GCP_DEPLOY_SA is missing"
+            exit 1
+          fi
+
+          echo "GCP configuration validated"
+
+
+      # -------------------------------------------------
+      # 3. Authenticate GitHub -> Google Cloud
+      # -------------------------------------------------
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOY_SA }}
+
+
+      # -------------------------------------------------
+      # 4. Install / configure gcloud
+      # -------------------------------------------------
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+
+      # -------------------------------------------------
+      # 5. Verify authentication
+      # -------------------------------------------------
+      - name: Verify Google Cloud authentication
+        run: |
+          echo "Authenticated account:"
+          gcloud auth list
+
+          echo ""
+          echo "Current project:"
+          gcloud config get-value project
+
+
+      # -------------------------------------------------
+      # 6. Create unique Docker image name
+      #
+      # Example:
+      # asia-south1-docker.pkg.dev/project/
+      # llmops-docker/rahul-chatbot:<git-sha>
+      # -------------------------------------------------
+      - name: Define Docker image
+        run: |
+          IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${ARTIFACT_REPO}/${SERVICE}:${GITHUB_SHA}"
+
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+          echo "Docker image:"
+          echo "$IMAGE"
+
+
+      # -------------------------------------------------
+      # 7. Authenticate Docker with Artifact Registry
+      # -------------------------------------------------
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker \
+            "${REGION}-docker.pkg.dev" \
+            --quiet
+
+
+      # -------------------------------------------------
+      # 8. Build production Docker image
+      # -------------------------------------------------
+      - name: Build production Docker image
+        run: |
+          docker build \
+            -t "$IMAGE" \
+            .
+
+
+      # -------------------------------------------------
+      # 9. Push image to Artifact Registry
+      # -------------------------------------------------
+      - name: Push Docker image to Artifact Registry
+        run: |
+          docker push "$IMAGE"
+
+
+      # -------------------------------------------------
+      # 10. Deploy image to Cloud Run
+      # -------------------------------------------------
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "$SERVICE" \
+            --project "$PROJECT_ID" \
+            --image "$IMAGE" \
+            --region "$REGION" \
+            --port "$APP_PORT" \
+            --quiet
+
+
+      # -------------------------------------------------
+      # 11. Get deployed Cloud Run URL
+      # -------------------------------------------------
+      - name: Get Cloud Run URL
+        run: |
+          SERVICE_URL=$(gcloud run services describe "$SERVICE" \
+            --project "$PROJECT_ID" \
+            --region "$REGION" \
+            --format="value(status.url)")
+
+          echo "SERVICE_URL=$SERVICE_URL" >> "$GITHUB_ENV"
+
+          echo ""
+          echo "Application deployed successfully:"
+          echo "$SERVICE_URL"
+
+
+      # -------------------------------------------------
+      # 12. Production health check
+      # -------------------------------------------------
+      - name: Production health check
+        run: |
+          echo "Testing:"
+          echo "$SERVICE_URL/health"
+
+          for i in {1..10}; do
+
+            if curl --fail "$SERVICE_URL/health"; then
+              echo ""
+              echo "Production application is healthy"
+              echo "Application URL: $SERVICE_URL"
+              exit 0
+            fi
+
+            echo "Cloud Run is not ready yet..."
+            sleep 5
+
+          done
+
+          echo "Production health check failed"
+
+          exit 1
