@@ -1,9 +1,14 @@
 import asyncio
 import time
 
-TOTAL_REQUESTS = 10
-CONCURRENCY_LIMIT = 2 # you can change it --> and note your observations
+TOTAL_REQUESTS = 50
+CONCURRENCY_LIMIT = 10 # you can change it --> and note your observations
 PROCESSING_SECONDS = 5
+
+
+# Completed requests: 50
+# Total duration: 125.0s
+# Average throughput: 0.40 req/sec
 
 async def handle_request(request_id,semaphore, start_time):
     arrived_at = time.perf_counter()
@@ -17,7 +22,6 @@ async def handle_request(request_id,semaphore, start_time):
 
         print(f"Request {request_id} processing started at {processing_started - start_time:.2f} seconds after waiting for {queue_wait:.2f} seconds in the queue")
         await asyncio.sleep(PROCESSING_SECONDS)  # Simulate processing time
-
         completed_at = time.perf_counter()
         latency = completed_at - arrived_at
 
