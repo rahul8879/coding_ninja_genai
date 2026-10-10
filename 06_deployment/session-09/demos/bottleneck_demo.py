@@ -6,7 +6,7 @@ TOTAL_REQUESTS = 10
 # Change this between runs: 1, 2, then 10.
 APP_LIMIT = 10
 # Our simulated LLM service can process only 2 calls at once.
-LLM_LIMIT = 2
+LLM_LIMIT = 10
 LLM_DELAY = 5
 
 
