@@ -35,3 +35,34 @@ class Doctor(Base):
         CheckConstraint("rating >= 0 AND rating <= 5", name="doctor_rating_range"),
     )
 
+
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    patient_id: Mapped[str] = mapped_column(String(50), default="demo-patient")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class Message(Base):
+    __tablename__ = "messages"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    conversation_id: Mapped[str] = mapped_column(
+        ForeignKey("conversations.id"), index=True
+    )
+    role: Mapped[str] = mapped_column(String(20))
+    content: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    __table_args__ = (
+        CheckConstraint("role IN ('user', 'assistant')", name="message_role_valid"),
+        CheckConstraint(
+            "status IN ('pending', 'completed', 'failed')", name="message_status_valid"
+        ),
+    )
