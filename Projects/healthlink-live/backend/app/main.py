@@ -3,8 +3,10 @@ from fastapi import FastAPI,HTTPException
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from app.database import engine
-app = FastAPI(title="HealthLink API", version="1.0.0")
+from app.doctor_routes import router as doctor_router
 
+app = FastAPI(title="HealthLink API", version="1.0.0")
+app.include_router(doctor_router)
 @app.get("/health")
 def health_check():
     return {"status": "ok", "service": "healthlink-api"}
