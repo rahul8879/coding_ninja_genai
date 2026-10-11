@@ -1,0 +1,6 @@
+# Step 1: API only. PostgreSQL is added when we implement persistence.
+services:
+  api:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"

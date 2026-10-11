@@ -1,0 +1,101 @@
+name,specialty,experience_years,rating,availability,location,email,phone,qualifications,languages,consultation_type
+Dr. Sarah Johnson,General Practice,15,4.8,Mon-Fri 9AM-5PM,Downtown Medical Center,sarah.johnson@healthlink.com,555-0101,MD - University of Health Sciences,English Spanish,In-person Telemedicine
+Dr. Michael Chen,Cardiology,20,4.9,Mon-Fri 8AM-4PM,Heart Care Clinic,michael.chen@healthlink.com,555-0102,MD Cardiology - Board Certified,English Mandarin,In-person
+Dr. Emily Rodriguez,Internal Medicine,12,4.7,Mon-Fri 10AM-6PM,City Health Center,emily.rodriguez@healthlink.com,555-0103,MD - Johns Hopkins,English Spanish Portuguese,Telemedicine In-person
+Dr. James Williams,Neurology,18,4.8,Tue-Sat 9AM-5PM,Brain & Spine Institute,james.williams@healthlink.com,555-0104,MD Neurology - Mayo Clinic Fellowship,English,In-person
+Dr. Lisa Anderson,Dermatology,10,4.6,Mon-Fri 9AM-5PM,Skin Care Specialists,lisa.anderson@healthlink.com,555-0105,MD Dermatology - Harvard Medical,English French,Telemedicine In-person
+Dr. Robert Taylor,Orthopedics,22,4.9,Mon-Fri 8AM-6PM,Sports Medicine Center,robert.taylor@healthlink.com,555-0106,MD Orthopedic Surgery - Sports Medicine,English,In-person
+Dr. Jennifer Lee,Gastroenterology,14,4.7,Mon-Fri 9AM-4PM,Digestive Health Clinic,jennifer.lee@healthlink.com,555-0107,MD GI - Board Certified Endoscopy,English Korean,In-person
+Dr. David Martinez,ENT,16,4.8,Mon-Fri 9AM-5PM,Ear Nose Throat Center,david.martinez@healthlink.com,555-0108,MD ENT - University of Texas,English Spanish,In-person Telemedicine
+Dr. Amanda White,Psychiatry,11,4.7,Mon-Sat 10AM-7PM,Mental Health Associates,amanda.white@healthlink.com,555-0109,MD Psychiatry - Licensed Psychotherapist,English,Telemedicine
+Dr. Christopher Brown,Emergency Medicine,13,4.8,24/7,Emergency Care Center,christopher.brown@healthlink.com,555-0110,MD Emergency Medicine - Trauma Certified,English,In-person
+Dr. Jessica Davis,Pediatrics,9,4.9,Mon-Fri 8AM-6PM,Children's Health Clinic,jessica.davis@healthlink.com,555-0111,MD Pediatrics - Neonatal Experience,English,In-person Telemedicine
+Dr. Daniel Wilson,General Practice,8,4.6,Mon-Fri 9AM-5PM,Family Care Center,daniel.wilson@healthlink.com,555-0112,MD - Residency Trained,English Spanish,In-person Telemedicine
+Dr. Michelle Thompson,Internal Medicine,17,4.8,Mon-Fri 9AM-5PM,City Health Center,michelle.thompson@healthlink.com,555-0113,MD Internal Medicine - Infectious Disease,English French,In-person Telemedicine
+Dr. Kevin Moore,Cardiology,19,4.9,Mon-Fri 8AM-4PM,Heart Care Clinic,kevin.moore@healthlink.com,555-0114,MD Cardiology - Interventional Specialist,English,In-person
+Dr. Rachel Garcia,Neurology,13,4.7,Mon-Fri 9AM-5PM,Brain & Spine Institute,rachel.garcia@healthlink.com,555-0115,MD Neurology - Stroke Specialist,English Spanish Portuguese,Telemedicine
+Dr. Mark Wilson,Pediatrics,11,4.8,Mon-Thu 9AM-5PM,Children's Health Clinic,mark.wilson@healthlink.com,555-0116,MD Pediatrics - Behavioral Pediatrics,English,In-person
+Dr. Susan Blake,Orthopedics,14,4.7,Mon-Fri 8AM-5PM,Sports Medicine Center,susan.blake@healthlink.com,555-0117,MD Orthopedic - Joint Replacement Specialist,English,In-person
+Dr. Thomas Anderson,Oncology,21,4.9,Mon-Fri 9AM-4PM,Cancer Treatment Center,thomas.anderson@healthlink.com,555-0118,MD Oncology - Fellowship Trained,English,In-person Telemedicine
+Dr. Victoria Lee,Pulmonology,16,4.8,Mon-Wed Fri 9AM-5PM,Respiratory Care Center,victoria.lee@healthlink.com,555-0119,MD Pulmonary - Sleep Medicine Board Certified,English Mandarin,In-person
+Dr. Alexander Smith,Urology,13,4.6,Tue-Sat 9AM-5PM,Advanced Urology Clinic,alexander.smith@healthlink.com,555-0120,MD Urology - Robotic Surgery Certified,English,In-person
+Dr. Patricia Brown,Rheumatology,18,4.8,Mon-Fri 10AM-5PM,Joint Care Institute,patricia.brown@healthlink.com,555-0121,MD Rheumatology - Autoimmune Disease Expert,English,Telemedicine In-person
+Dr. Andrew Martinez,Nephrology,15,4.7,Mon-Fri 9AM-4PM,Kidney Health Center,andrew.martinez@healthlink.com,555-0122,MD Nephrology - Dialysis Management,English Spanish,In-person
+Dr. Caroline Thompson,Ophthalmology,12,4.9,Mon-Fri 9AM-5PM,Vision Care Clinic,caroline.thompson@healthlink.com,555-0123,MD Ophthalmology - Cataract Surgery Specialist,English,In-person
+Dr. Benjamin Davis,Psychiatry,10,4.7,Mon-Sat 11AM-7PM,Mental Health Associates,benjamin.davis@healthlink.com,555-0124,MD Psychiatry - Addiction Medicine,English,Telemedicine
+Dr. Diana Lopez,Gynecology,14,4.8,Mon-Thu 9AM-5PM,Women's Health Center,diana.lopez@healthlink.com,555-0125,MD OB/GYN - Maternal Fetal Medicine,English Spanish,In-person Telemedicine
+Dr. Austin Jimenez,Pain Management,6,4.7,Mon-Thu 9AM-5PM,City Health Center,austin.jimenez@healthlink.com,555-0126,MD - Specialized in Pain Management,English Vietnamese,Telemedicine
+Dr. Sara Robinson,Gynecology,21,4.8,Mon-Thu 9AM-5PM,Premier Health Associates,sara.robinson1@healthlink.com,555-0127,MD Gynecology - Board Certified,English,In-person
+Dr. Jeffrey Phillips,Pain Management,22,4.7,Tue-Sat 9AM-5PM,Community Hospital,jeffrey.phillips2@healthlink.com,555-0128,DO Pain Management - Board Certified,English Spanish Portuguese,Telemedicine
+Dr. Dorothy James,Psychiatry,30,4.7,Tue-Sat 9AM-5PM,Digestive Health Clinic,dorothy.james3@healthlink.com,555-0129,MD - Specialized in Psychiatry,English Korean,In-person Telemedicine
+Dr. Barbara Perez,Ophthalmology,19,4.9,Mon-Fri 9AM-5PM,Downtown Medical Center,barbara.perez4@healthlink.com,555-0130,MD - Fellowship in Ophthalmology,English Portuguese,In-person
+Dr. Jeffrey Davis,Sleep Medicine,22,4.7,Mon-Wed Fri 9AM-5PM,Sports Medicine Center,jeffrey.davis5@healthlink.com,555-0131,MD Sleep Medicine - Board Certified,English Arabic,Telemedicine
+Dr. Kevin Watson,Sports Medicine,26,4.7,Mon-Fri 11AM-7PM,Comprehensive Care Clinic,kevin.watson6@healthlink.com,555-0132,MD Sports Medicine - University Trained,English Portuguese,In-person
+Dr. Tyler Richardson,Dermatology,11,4.5,Mon-Fri 8AM-6PM,Kidney Health Center,tyler.richardson7@healthlink.com,555-0133,MD - Specialized in Dermatology,English Vietnamese,In-person Telemedicine
+Dr. Donna Patterson,Pulmonology,12,5.0,Tue-Sat 9AM-5PM,Cancer Treatment Center,donna.patterson8@healthlink.com,555-0134,MD - Specialized in Pulmonology,English,Telemedicine
+Dr. Lisa Stewart,Sleep Medicine,18,4.6,Mon-Fri 8AM-6PM,Vision Care Clinic,lisa.stewart9@healthlink.com,555-0135,MD - Fellowship in Sleep Medicine,English Mandarin,Telemedicine
+Dr. Debra Bell,Anesthesiology,19,5.0,Mon-Fri 8AM-4PM,University Medical Center,debra.bell10@healthlink.com,555-0136,DO Anesthesiology - Board Certified,English Arabic,In-person Telemedicine
+Dr. Katherine Ramirez,Nephrology,5,4.5,Mon-Thu 9AM-5PM,Brain & Spine Institute,katherine.ramirez11@healthlink.com,555-0137,MD - Fellowship in Nephrology,English French,Telemedicine
+Dr. Gloria Romero,Cardiology,22,4.8,Tue-Sat 9AM-5PM,City Health Center,gloria.romero12@healthlink.com,555-0138,MD Cardiology - University Trained,English Korean,Telemedicine
+Dr. Dorothy Vasquez,Hematology,17,4.5,Mon-Fri 11AM-7PM,Heart Care Clinic,dorothy.vasquez13@healthlink.com,555-0139,MD Hematology - University Trained,English Mandarin,Telemedicine
+Dr. Shirley Jimenez,Nephrology,21,4.7,Mon-Sat 10AM-7PM,Kidney Health Center,shirley.jimenez14@healthlink.com,555-0140,MD Nephrology - Board Certified,English German,In-person Telemedicine
+Dr. Matthew Cooper,Sleep Medicine,15,4.6,Mon-Thu 9AM-5PM,Advanced Urology Clinic,matthew.cooper15@healthlink.com,555-0141,MD - Specialized in Sleep Medicine,English French,Telemedicine
+Dr. Adam Martin,Cardiology,29,4.8,Mon-Sat 10AM-7PM,Heart Care Clinic,adam.martin16@healthlink.com,555-0142,MD Cardiology - University Trained,English Hindi,Telemedicine
+Dr. Anthony West,Gynecology,11,4.7,Mon-Fri 8AM-6PM,Community Hospital,anthony.west17@healthlink.com,555-0143,MD - Specialized in Gynecology,English French,In-person Telemedicine
+Dr. Brian Jimenez,Internal Medicine,8,4.7,Mon-Fri 11AM-7PM,Kidney Health Center,brian.jimenez18@healthlink.com,555-0144,MD Internal Medicine - University Trained,English German,Telemedicine
+Dr. Emma Nelson,Hematology,15,5.0,Mon-Fri 9AM-5PM,Downtown Medical Center,emma.nelson19@healthlink.com,555-0145,MD - Fellowship in Hematology,English Korean,In-person Telemedicine
+Dr. Noah Bell,Urology,15,4.6,Mon-Wed Fri 9AM-5PM,Children's Health Clinic,noah.bell20@healthlink.com,555-0146,MD - Specialized in Urology,English Vietnamese,In-person Telemedicine
+Dr. Madison Howard,Sports Medicine,18,4.8,Mon-Fri 8AM-6PM,Respiratory Care Center,madison.howard21@healthlink.com,555-0147,DO Sports Medicine - Board Certified,English Spanish Portuguese,In-person
+Dr. Kevin Morris,Allergy & Immunology,17,4.7,Mon-Thu 9AM-5PM,Brain & Spine Institute,kevin.morris22@healthlink.com,555-0148,MD Allergy & Immunology - Board Certified,English Mandarin Cantonese,Telemedicine
+Dr. Ethan Griffin,Geriatrics,23,4.6,Mon-Thu 9AM-5PM,Ear Nose Throat Center,ethan.griffin23@healthlink.com,555-0149,MD Geriatrics - University Trained,English Portuguese,In-person
+Dr. Terry Gonzalez,General Practice,10,4.8,Tue-Fri 9AM-5PM,Children's Health Clinic,terry.gonzalez24@healthlink.com,555-0150,MD General Practice - University Trained,English German,Telemedicine
+Dr. Peter Barnes,Pathology,15,4.7,Mon-Fri 10AM-6PM,Ear Nose Throat Center,peter.barnes25@healthlink.com,555-0151,MD - Fellowship in Pathology,English German,In-person Telemedicine
+Dr. Janet Jenkins,Emergency Medicine,14,4.8,Mon-Fri 11AM-7PM,Kidney Health Center,janet.jenkins26@healthlink.com,555-0152,MD - Fellowship in Emergency Medicine,English Vietnamese,In-person Telemedicine
+Dr. Nancy Green,Emergency Medicine,12,4.8,Mon-Fri 8AM-4PM,Advanced Urology Clinic,nancy.green27@healthlink.com,555-0153,MD Emergency Medicine - Board Certified,English Spanish Portuguese,In-person
+Dr. Anna Edwards,Nephrology,23,4.7,Mon-Fri 10AM-6PM,Family Care Center,anna.edwards28@healthlink.com,555-0154,MD - Specialized in Nephrology,English Korean,Telemedicine
+Dr. Diane Long,Urology,11,4.6,Mon-Wed Fri 9AM-5PM,Regional Medical Plaza,diane.long29@healthlink.com,555-0155,MD Urology - Board Certified,English Spanish Portuguese,In-person
+Dr. Ryan Ramirez,Gastroenterology,10,4.6,Mon-Thu 9AM-5PM,Skin Care Specialists,ryan.ramirez30@healthlink.com,555-0156,MD Gastroenterology - University Trained,English Arabic,In-person Telemedicine
+Dr. Anthony Ross,Pediatrics,18,5.0,Mon-Fri 8AM-4PM,Heart Care Clinic,anthony.ross31@healthlink.com,555-0157,MD Pediatrics - Board Certified,English German,In-person Telemedicine
+Dr. Jack Hughes,Sports Medicine,15,4.8,Tue-Fri 9AM-5PM,Joint Care Institute,jack.hughes32@healthlink.com,555-0158,MD Sports Medicine - Board Certified,English French,Telemedicine
+Dr. Martha White,Nephrology,19,4.6,Tue-Fri 9AM-5PM,Downtown Medical Center,martha.white33@healthlink.com,555-0159,MD Nephrology - Board Certified,English Japanese,In-person Telemedicine
+Dr. George Ramos,Pathology,20,4.7,Mon-Thu 9AM-5PM,Heart Care Clinic,george.ramos34@healthlink.com,555-0160,MD - Specialized in Pathology,English Vietnamese,In-person Telemedicine
+Dr. Joshua Walker,Infectious Disease,19,4.7,Mon-Fri 11AM-7PM,Community Hospital,joshua.walker35@healthlink.com,555-0161,MD - Fellowship in Infectious Disease,English Mandarin,In-person
+Dr. Sean James,Radiology,19,4.5,Mon-Wed Fri 9AM-5PM,Suburban Medical Plaza,sean.james36@healthlink.com,555-0162,MD Radiology - University Trained,English Mandarin,Telemedicine
+Dr. William Henderson,Gastroenterology,20,4.6,Tue-Fri 9AM-5PM,Comprehensive Care Clinic,william.henderson37@healthlink.com,555-0163,MD - Specialized in Gastroenterology,English Spanish Portuguese,In-person
+Dr. Henry Ruiz,ENT,12,4.6,Mon-Fri 11AM-7PM,University Medical Center,henry.ruiz38@healthlink.com,555-0164,MD ENT - University Trained,English Spanish,In-person Telemedicine
+Dr. Raymond Nguyen,Pathology,17,4.7,Tue-Sat 9AM-5PM,Children's Health Clinic,raymond.nguyen39@healthlink.com,555-0165,MD - Fellowship in Pathology,English Hindi,In-person Telemedicine
+Dr. Tyler Miller,Pain Management,27,4.8,Mon-Fri 8AM-4PM,Family Care Center,tyler.miller40@healthlink.com,555-0166,MD Pain Management - University Trained,English Spanish Portuguese,In-person
+Dr. Sean Young,Endocrinology,23,4.6,Mon-Fri 11AM-7PM,Community Hospital,sean.young41@healthlink.com,555-0167,MD Endocrinology - Board Certified,English Spanish Portuguese,In-person
+Dr. Andrea Jenkins,Internal Medicine,16,4.6,Mon-Fri 10AM-6PM,Coastal Medical Group,andrea.jenkins42@healthlink.com,555-0168,MD Internal Medicine - Board Certified,English Russian,In-person Telemedicine
+Dr. Larry Henderson,Physical Medicine,13,4.8,Mon-Thu 9AM-5PM,Mental Health Associates,larry.henderson43@healthlink.com,555-0169,MD Physical Medicine - University Trained,English German,In-person Telemedicine
+Dr. Samuel Sullivan,Cardiology,19,4.8,Mon-Fri 11AM-7PM,City Health Center,samuel.sullivan44@healthlink.com,555-0170,DO Cardiology - Board Certified,English French,Telemedicine
+Dr. Jessica Green,Hematology,16,4.6,Mon-Sat 10AM-7PM,Community Hospital,jessica.green45@healthlink.com,555-0171,MD - Specialized in Hematology,English Hindi,In-person Telemedicine
+Dr. Stephen Chavez,Rheumatology,16,4.8,Mon-Fri 8AM-6PM,Children's Health Clinic,stephen.chavez46@healthlink.com,555-0172,MD - Specialized in Rheumatology,English Mandarin Cantonese,In-person Telemedicine
+Dr. Aaron Sanders,Nephrology,25,4.8,Mon-Fri 11AM-7PM,Metropolitan Health Center,aaron.sanders47@healthlink.com,555-0173,MD Nephrology - University Trained,English Mandarin Cantonese,In-person
+Dr. Frances Perez,Sleep Medicine,20,4.8,Tue-Fri 9AM-5PM,Vision Care Clinic,frances.perez48@healthlink.com,555-0174,MD Sleep Medicine - University Trained,English Portuguese,In-person
+Dr. Jacob Gutierrez,Sleep Medicine,7,4.7,Mon-Sat 10AM-7PM,Heart Care Clinic,jacob.gutierrez49@healthlink.com,555-0175,MD Sleep Medicine - Board Certified,English Japanese,In-person
+Dr. Margaret Mitchell,Pathology,10,4.7,Mon-Thu 9AM-5PM,Community Hospital,margaret.mitchell50@healthlink.com,555-0176,MD - Specialized in Pathology,English Vietnamese,In-person Telemedicine
+Dr. Julie Parker,Rheumatology,10,4.7,Mon-Fri 9AM-5PM,Digestive Health Clinic,julie.parker51@healthlink.com,555-0177,MD Rheumatology - University Trained,English Korean,In-person Telemedicine
+Dr. Paul Vasquez,Hematology,21,4.5,Mon-Fri 8AM-4PM,Heart Care Clinic,paul.vasquez52@healthlink.com,555-0178,MD - Specialized in Hematology,English Arabic,In-person Telemedicine
+Dr. Kathleen Wilson,Rheumatology,17,4.9,Mon-Fri 8AM-6PM,Downtown Medical Center,kathleen.wilson53@healthlink.com,555-0179,MD Rheumatology - Board Certified,English Arabic,In-person Telemedicine
+Dr. Thomas Hill,General Practice,19,4.6,Mon-Wed Fri 9AM-5PM,Heart Care Clinic,thomas.hill54@healthlink.com,555-0180,MD - Specialized in General Practice,English Spanish Portuguese,In-person
+Dr. Ann Miller,Allergy & Immunology,21,5.0,Mon-Fri 11AM-7PM,Respiratory Care Center,ann.miller55@healthlink.com,555-0181,MD - Specialized in Allergy & Immunology,English Mandarin Cantonese,In-person Telemedicine
+Dr. Michelle Ramos,Infectious Disease,19,4.7,Tue-Fri 9AM-5PM,Kidney Health Center,michelle.ramos56@healthlink.com,555-0182,MD Infectious Disease - University Trained,English Japanese,In-person
+Dr. Raymond Rogers,Geriatrics,10,5.0,Mon-Fri 8AM-4PM,Family Care Center,raymond.rogers57@healthlink.com,555-0183,MD Geriatrics - Board Certified,English Spanish Portuguese,In-person Telemedicine
+Dr. Donald Taylor,Gynecology,17,4.5,Mon-Fri 8AM-6PM,Women's Health Center,donald.taylor58@healthlink.com,555-0184,MD Gynecology - Board Certified,English Russian,Telemedicine
+Dr. Richard Evans,Nephrology,12,4.8,Mon-Thu 9AM-5PM,City Health Center,richard.evans59@healthlink.com,555-0185,DO Nephrology - Board Certified,English Japanese,In-person
+Dr. Kevin Parker,Geriatrics,7,4.8,Mon-Fri 8AM-4PM,Premier Health Associates,kevin.parker60@healthlink.com,555-0186,MD Geriatrics - Board Certified,English Korean,In-person
+Dr. Andrea Patel,Nephrology,11,4.9,Mon-Thu 9AM-5PM,Emergency Care Center,andrea.patel61@healthlink.com,555-0187,DO Nephrology - Board Certified,English Spanish Portuguese,Telemedicine
+Dr. Lawrence Hernandez,Pain Management,29,4.6,Tue-Sat 9AM-5PM,Suburban Medical Plaza,lawrence.hernandez62@healthlink.com,555-0188,MD - Fellowship in Pain Management,English Vietnamese,In-person Telemedicine
+Dr. Paul Ruiz,Urology,24,4.7,Tue-Fri 9AM-5PM,Family Care Center,paul.ruiz63@healthlink.com,555-0189,MD - Specialized in Urology,English Hindi,Telemedicine
+Dr. Harold Hill,Allergy & Immunology,19,5.0,Mon-Wed Fri 9AM-5PM,Sports Medicine Center,harold.hill64@healthlink.com,555-0190,MD - Fellowship in Allergy & Immunology,English Spanish Portuguese,Telemedicine
+Dr. Joan Alvarez,Cardiology,24,4.8,Mon-Fri 8AM-4PM,Advanced Urology Clinic,joan.alvarez65@healthlink.com,555-0191,MD Cardiology - University Trained,English Russian,Telemedicine
+Dr. Sandra Brooks,Sports Medicine,27,4.9,Mon-Fri 11AM-7PM,Joint Care Institute,sandra.brooks66@healthlink.com,555-0192,MD - Fellowship in Sports Medicine,English German,Telemedicine
+Dr. Karen Reynolds,Nephrology,8,4.9,Mon-Fri 9AM-5PM,Respiratory Care Center,karen.reynolds67@healthlink.com,555-0193,MD Nephrology - Board Certified,English Russian,In-person
+Dr. Teresa Moore,Radiology,22,4.7,Mon-Fri 10AM-6PM,Cancer Treatment Center,teresa.moore68@healthlink.com,555-0194,MD Radiology - University Trained,English,Telemedicine
+Dr. Angela Watson,Rheumatology,7,4.5,Mon-Wed Fri 9AM-5PM,Digestive Health Clinic,angela.watson69@healthlink.com,555-0195,DO Rheumatology - Board Certified,English Korean,In-person Telemedicine
+Dr. Samantha Jackson,Sleep Medicine,30,4.5,Mon-Fri 11AM-7PM,Kidney Health Center,samantha.jackson70@healthlink.com,555-0196,MD Sleep Medicine - Board Certified,English French,In-person
+Dr. Zachary Thompson,Geriatrics,20,4.6,Mon-Fri 11AM-7PM,Comprehensive Care Clinic,zachary.thompson71@healthlink.com,555-0197,DO Geriatrics - Board Certified,English Korean,In-person Telemedicine
+Dr. Sean Jackson,Urology,22,4.7,Mon-Thu 9AM-5PM,University Medical Center,sean.jackson72@healthlink.com,555-0198,MD - Fellowship in Urology,English Japanese,In-person Telemedicine
+Dr. Jason Lee,Gastroenterology,22,4.7,Mon-Wed Fri 9AM-5PM,Sports Medicine Center,jason.lee73@healthlink.com,555-0199,MD Gastroenterology - Board Certified,English Spanish,In-person Telemedicine
+Dr. Patricia Myers,Allergy & Immunology,18,4.6,Mon-Sat 10AM-7PM,Advanced Urology Clinic,patricia.myers74@healthlink.com,555-0200,MD - Fellowship in Allergy & Immunology,English Russian,In-person Telemedicine
