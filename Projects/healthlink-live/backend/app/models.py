@@ -10,6 +10,7 @@ from sqlalchemy import (
     String,
     Text,
     func,
+    UniqueConstraint
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -65,4 +66,20 @@ class Message(Base):
         CheckConstraint(
             "status IN ('pending', 'completed', 'failed')", name="message_status_valid"
         ),
+    )
+
+
+class Appointment(Base):
+    __tablename__ = "appointments"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    patient_id: Mapped[str] = mapped_column(String(50), default="demo-patient")
+    conversation_id: Mapped[str] = mapped_column(ForeignKey("conversations.id"), index=True)
+    doctor_id: Mapped[int] = mapped_column(ForeignKey("doctors.id"), index=True)
+    starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    idempotency_key: Mapped[str] = mapped_column(String(36), unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    __table_args__ = (
+        UniqueConstraint("doctor_id", "starts_at", name="uq_appointment_doctor_start"),
+        CheckConstraint("ends_at > starts_at", name="appointment_end_after_start"),
     )

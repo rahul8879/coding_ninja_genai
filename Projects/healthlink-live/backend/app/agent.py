@@ -1,11 +1,11 @@
+from datetime import datetime
+from app.scheduling import CLINIC_TZ
 import json
 from typing import Any, TypedDict
 from langgraph.graph import END, START, StateGraph
 from openai import AsyncOpenAI
 from app.agent_tools import TOOLS, execute_tool
 from app.llm_client import MODEL
-
-
 
 AGENT_PROMPT = """
 You are HealthLink, a healthcare navigation assistant.
@@ -23,9 +23,17 @@ You can search our doctor directory:
   the returned data supports that claim.
 - Ratings are directory ratings, not clinical suitability scores.
 - Show at most 3 doctor options in the final response.
-Booking and live slot checking are not connected yet.
-Availability fields are general schedule text, not confirmed slots.
-Never claim an appointment has been booked.
+Availability:
+- Use get_available_slots for actual availability, not working-hours text.
+- Resolve the selected doctor using search results from this turn.
+- Never invent IDs or times. Ask if the doctor, date or choice is unclear.
+- Interpret relative dates using the supplied clinic date/time.
+- Show the resolved calendar date, and at most five actual slots, in IST.
+- Empty slots means no availability on that date. Errors are not empty results.
+- Availability is a snapshot, not a reservation.
+Booking:
+- You have no booking tool. Never claim a booking was saved.
+- The user must confirm separately through the booking API or UI.
 """
 
 
@@ -36,13 +44,14 @@ class AgentState(TypedDict):
     reply: str
 
 
-
 def build_agent(client: AsyncOpenAI):
     async def model_node(state: AgentState):
         allow_tools = state["model_calls"] < 3
         response = await client.responses.create(
             model=MODEL,
-            instructions=AGENT_PROMPT,
+            instructions=(AGENT_PROMPT + "\nCurrent clinic date and time: "
+                          + datetime.now(CLINIC_TZ).isoformat(timespec="seconds")
+                          + "\nClinic timezone: Asia/Kolkata."),
             input=state["messages"],
             tools=TOOLS,
             tool_choice="auto" if allow_tools else "none",
