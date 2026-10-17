@@ -1,4 +1,3 @@
-from app.llm_client import generate_reply
 import logging
 from uuid import UUID
 from fastapi import APIRouter, HTTPException, Request
@@ -28,8 +27,6 @@ def start_conversation():
         raise HTTPException(
             503, "Could not create conversation. Database unavailable."
         ) from None
-
-
 
 
 @router.get("/{conversation_id}/messages")
@@ -62,11 +59,12 @@ async def send_message(conversation_id: UUID, payload: ChatRequest, request: Req
     except SQLAlchemyError:
         raise HTTPException(503, "Could not save your message.") from None
     try:
-        reply = await generate_reply(
-            client=request.app.state.llm_client,
-            message=payload.message,
-            history=history,
+        messages = history + [{"role": "user", "content": payload.message}]
+        result = await request.app.state.agent.ainvoke(
+            {"messages": messages, "tool_calls": [], "model_calls": 0, "reply": ""},
+            config={"recursion_limit": 12},
         )
+        reply = result["reply"]
         await run_in_threadpool(complete_turn, message_id, reply)
         return ChatResponse(reply=reply)
     except (APIError, ValueError, SQLAlchemyError) as exc:

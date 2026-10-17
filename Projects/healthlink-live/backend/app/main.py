@@ -1,20 +1,24 @@
 # Step 1: write your FastAPI application here, following the instructions.
-from app.conversation_routes import router as conversation_router
+import logging
 from contextlib import asynccontextmanager
-from app.llm_client import create_llm_client
-from app.doctor_routes import router as doctor_router
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from app.database import engine
+from app.doctor_routes import router as doctor_router
+from app.conversation_routes import router as conversation_router
+from app.llm_client import create_llm_client
+from app.agent import build_agent
 
-from contextlib import asynccontextmanager
+logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
+
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.llm_client = create_llm_client()
     try:
+        app.state.agent = build_agent(app.state.llm_client)
         yield
     finally:
         await app.state.llm_client.close()

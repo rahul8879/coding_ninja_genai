@@ -2,6 +2,7 @@ from sqlalchemy import func, select
 from app.database import engine
 from app.models import Doctor
 
+
 def search_doctors(specialty: str | None = None):
     query = select(
         Doctor.id,
@@ -20,3 +21,9 @@ def search_doctors(specialty: str | None = None):
     with engine.connect() as connection:
         rows = connection.execute(query).mappings().all()
     return [dict(row) for row in rows]
+
+
+def list_specialties():
+    query = select(Doctor.specialty).distinct().order_by(Doctor.specialty)
+    with engine.connect() as connection:
+        return list(connection.execute(query).scalars().all())
