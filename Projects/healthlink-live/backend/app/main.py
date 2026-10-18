@@ -3,12 +3,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
-from app.database import engine
-from app.doctor_routes import router as doctor_router
-from app.conversation_routes import router as conversation_router
-from app.llm_client import create_llm_client
-from app.agent import build_agent
-from app.appointment_routes import router as appointment_router
+from app.db.database import engine
+from app.routes.doctor_routes import router as doctor_router
+from app.routes.conversation_routes import router as conversation_router
+from app.agent.llm_client import create_llm_client
+from app.agent.graph import build_agent
+from app.routes.appointment_routes import router as appointment_router
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
 

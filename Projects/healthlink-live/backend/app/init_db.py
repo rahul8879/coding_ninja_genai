@@ -1,12 +1,5 @@
-from app.database import engine
-from app.models import Base
-
-
-def main():
-    with engine.begin() as connection:
-        Base.metadata.create_all(connection)
-    print("Database tables are ready.")
-
+# Compatibility import; edit the implementation in its new folder.
+from app.db.init_db import *
 
 if __name__ == "__main__":
     main()
