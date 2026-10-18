@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, Request
 from openai import APIError, APITimeoutError, RateLimitError
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.concurrency import run_in_threadpool
+from app.observability.tracing import run_agent_with_trace
 
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.services.conversation_service import (
@@ -107,15 +108,22 @@ async def send_message(
 
         # Start each turn with no booking proposal.
         # prepare_booking can populate this field in the graph.
-        result = await request.app.state.agent.ainvoke(
-            {
-                "messages": messages,
-                "tool_calls": [],
-                "model_calls": 0,
-                "reply": "",
-                "booking_proposal": None,
-            },
-            config={"recursion_limit": 12},
+        # result = await request.app.state.agent.ainvoke(
+        #     {
+        #         "messages": messages,
+        #         "tool_calls": [],
+        #         "model_calls": 0,
+        #         "reply": "",
+        #         "booking_proposal": None,
+        #     },
+        #     config={"recursion_limit": 12},
+        # )
+
+        result = await run_agent_with_trace(
+            langfuse=request.app.state.langfuse,
+            agent=request.app.state.agent,
+            conversation_id=str(conversation_id),
+            messages=messages,
         )
 
         reply = result["reply"]
