@@ -7,3 +7,7 @@ python-dotenv>=1.0,<2.0
 openai>=2.0,<4.0
 langgraph>=1.0,<2.0
 langfuse>=4,<5
+
+deepeval>=4.3,<5
+pytest
+pytest-html
