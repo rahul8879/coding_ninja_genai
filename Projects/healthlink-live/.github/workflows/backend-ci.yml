@@ -1,0 +1,229 @@
+name: HealthLink Backend CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-ci:
+    name: Backend API checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # Live API secrets are unavailable to fork/Dependabot PRs.
+    # Do not use pull_request_target to bypass this boundary.
+    if: >-
+      github.actor != 'dependabot[bot]' &&
+      (
+        github.event_name != 'pull_request' ||
+        github.event.pull_request.head.repo.full_name == github.repository
+      )
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: healthlink
+          POSTGRES_PASSWORD: healthlink_ci_only
+          POSTGRES_DB: healthlink_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U healthlink -d healthlink_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      PYTHONPATH: backend
+      PYTHONUNBUFFERED: "1"
+
+      # Temporary CI database; not your local application database.
+      DATABASE_URL: postgresql+psycopg://healthlink:healthlink_ci_only@127.0.0.1:5432/healthlink_test
+
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_BASE_URL: https://api.openai.com/v1
+      OPENAI_MODEL: gpt-4.1-mini
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+
+      - name: Verify API secret
+        run: |
+          python - <<'PY'
+          import os
+
+          if not os.environ.get("OPENAI_API_KEY", "").strip():
+              raise SystemExit(
+                  "Add OPENAI_API_KEY to repository Actions secrets."
+              )
+
+          print("Required secret is configured.")
+          PY
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+
+          if [ -f backend/requirements.lock.txt ]; then
+            python -m pip install -r backend/requirements.lock.txt
+          else
+            python -m pip install -r backend/requirements.txt
+          fi
+
+          python -m pip install pytest pytest-html httpx
+          python -m pip check
+
+      - name: Check Python syntax
+        run: python -m compileall -q backend/app
+
+      - name: Initialize test database
+        run: |
+          # Supports both our flat and restructured layouts.
+          if [ -f backend/app/db/init_db.py ]; then
+            python -m app.db.init_db
+            python -m app.db.seed_doctors
+          else
+            python -m app.init_db
+            python -m app.seed_doctors
+          fi
+
+      - name: Start backend
+        run: |
+          mkdir -p reports
+
+          python -m uvicorn app.main:app \
+            --host 127.0.0.1 \
+            --port 8000 \
+            > reports/backend.log 2>&1 &
+
+          echo "$!" > "$RUNNER_TEMP/healthlink-backend.pid"
+
+      - name: Wait for backend
+        run: |
+          python - <<'PY'
+          import time
+          import httpx
+
+          for attempt in range(30):
+              try:
+                  response = httpx.get(
+                      "http://127.0.0.1:8000/health",
+                      timeout=2,
+                  )
+                  if response.status_code == 200:
+                      print("Backend is ready for testing.")
+                      break
+              except httpx.HTTPError:
+                  pass
+
+              time.sleep(1)
+          else:
+              raise SystemExit(
+                  "Backend did not start. Inspect backend.log."
+              )
+          PY
+
+      - name: Create API smoke test
+        run: |
+          mkdir -p .ci-generated
+
+          cat > .ci-generated/test_backend.py <<'PY'
+          import httpx
+
+
+          def test_real_conversation_round_trip():
+              with httpx.Client(
+                  base_url="http://127.0.0.1:8000",
+                  timeout=120,
+              ) as client:
+                  # Create a real conversation in PostgreSQL.
+                  response = client.post("/conversations")
+                  assert response.status_code == 201, response.text
+
+                  conversation_id = response.json()["id"]
+                  path = f"/conversations/{conversation_id}/messages"
+
+                  # Call the actual application and real LLM.
+                  question = "Hello, what can you help me with?"
+                  response = client.post(
+                      path,
+                      json={"message": question},
+                  )
+
+                  assert response.status_code == 200, response.text
+
+                  body = response.json()
+
+                  assert isinstance(body.get("reply"), str)
+                  assert body["reply"].strip()
+
+                  # Verify the frontend response contract.
+                  assert "booking_proposal" in body
+                  assert body["booking_proposal"] is None
+
+                  # Verify the turn was actually persisted.
+                  response = client.get(path)
+                  assert response.status_code == 200, response.text
+
+                  messages = response.json()["messages"]
+
+                  assert any(
+                      message["role"] == "user"
+                      and message["content"] == question
+                      and message["status"] == "completed"
+                      for message in messages
+                  )
+
+                  assert any(
+                      message["role"] == "assistant"
+                      and message["content"] == body["reply"]
+                      and message["status"] == "completed"
+                      for message in messages
+                  )
+          PY
+
+      - name: Run real API test
+        run: |
+          python -m pytest .ci-generated/test_backend.py \
+            -v \
+            --capture=tee-sys \
+            --html=reports/backend-ci.html \
+            --self-contained-html \
+            --junitxml=reports/backend-ci.xml
+
+      - name: Stop backend
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/healthlink-backend.pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/healthlink-backend.pid")" || true
+          fi
+
+      - name: Upload reports and backend logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-ci-${{ github.run_number }}
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 7
